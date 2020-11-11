@@ -42,9 +42,9 @@ export class Card {
             art.onload = function(){
                 ctx.drawImage(art, 16, 50);
             }.bind(this);
-            art.src = 'art/' + data.art + '.png';
+            art.src = 'res/art/' + data.art + '.png';
         }.bind(this);
-        frame.src = 'frame.png';
+        frame.src = 'res/frame.png';
     }
 
 

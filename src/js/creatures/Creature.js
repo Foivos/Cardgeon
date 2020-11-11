@@ -8,5 +8,6 @@ export class Creature {
         this.sprite.src = image + '.png';
         this.speed = 4;
         this.hp = 100;
+        this.armor = 0;
     }
 };

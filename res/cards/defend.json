@@ -1,0 +1,16 @@
+{
+    "name" : "Defend",
+    "art" : "defend",
+    "text" : "Gain 5 Armor",
+    "targets" : [
+        {
+            "type" : "self"
+        }
+    ],
+    "effects" : [
+        {
+            "type" : "block",
+            "armor" : 5
+        }
+    ]
+}

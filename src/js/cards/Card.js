@@ -1,4 +1,5 @@
 import { renderer } from '../core/Renderer.js';
+import { getInfo } from '../core/Utils.js';
 
 
 
@@ -6,33 +7,39 @@ export class Card {
     static W=256*0.75;
     static H=378*0.75;
     static nextId = 0;
-    constructor() {
+    constructor(name) {
         this.id = Card.nextId++;
-        this.range = 3;
+
         this.elem = document.createElement("canvas");
-        this.pos = {};
-        this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
-        
         this.elem.style.position = 'absolute';
         this.elem.id = 'card' + this.id;
         this.elem.width = Card.W;
         this.elem.height = Card.H;
-        var ctx = this.elem.getContext('2d');
-        ctx.scale(0.75, 0.75);
+
+        this.pos = {};
+        this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
+        this.target = {};
+        this.speed = 0;
+        
+        
+        document.body.appendChild(this.elem);
+        getInfo('cards/' + name, this.init.bind(this));
+    }
+
+    init(data) {
+        this.range = data.targets[0].range;
         var frame = new Image();
         frame.onload = function(){
+            var ctx = this.elem.getContext('2d');
+            ctx.scale(0.75, 0.75);
             ctx.drawImage(frame, 0, 0);
             var art = new Image();
             art.onload = function(){
                 ctx.drawImage(art, 20, 20);
             }.bind(this);
-            art.src = 'image' + (this.id%3+1) + '.png';
+            art.src = 'art/' + data.art + '.png';
         }.bind(this);
         frame.src = 'frame.png';
-
-        document.body.appendChild(this.elem);
-        this.target = {};
-        this.speed = 0;
     }
 
 
@@ -88,7 +95,7 @@ export class Card {
 
     setScale(scale) {
         if(!scale && scale !== 0) {
-            console.log(scale);
+            console.trace();
         }
         this.pos.scale = scale;
         this.elem.style.width = Card.W*scale;
@@ -124,5 +131,11 @@ export class Card {
 
     activate(target) {
         target.hp -= 10;
+    }
+
+    hide() {
+        this.elem.style.display = 'none';
+        this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
+        delete renderer.movingCards[this.id];
     }
 };

@@ -4,8 +4,9 @@ class Pane {
     constructor() {
         this.W = 200;
         this.elem = document.createElement('div');
-        this.elem.style.position = 'absolute';
-        this.elem.id = 'pane';
+        this.elem.style.width = this.W;
+        this.elem.style.height = document.body.clientHeight;
+        this.elem.className = 'pane';
         
         this.resize();
         
@@ -14,7 +15,7 @@ class Pane {
         this.makeButton('end turn', end);
 
         this.image = document.createElement('img');
-        this.image.style.position = 'absolute'
+        this.image.className = 'paneImage';
         this.image.style.width = this.W-20;
         this.image.style.height = this.W-20;
         this.image.style.top = 10;
@@ -27,6 +28,7 @@ class Pane {
         this.text.style.height = 30;
         this.text.style.top = this.W;
         this.text.style.left = 10;
+        this.text.style.color = 'white';
         this.elem.appendChild(this.text);
 
         document.body.appendChild(this.elem);
@@ -40,7 +42,7 @@ class Pane {
     }
     makeButton(name, onclick) {
         var button = document.createElement('button');
-        button.style.position = 'absolute'
+        button.className = 'paneButton'
         button.style.width = this.W-20;
         button.style.height = 40;
         button.style.top = this.h0;

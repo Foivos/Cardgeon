@@ -11,7 +11,9 @@ class TurnOrder extends Array{
 
     advance() {
         this.i = (this.i+1) % this.length;
+        turn.end();
         turn.set(this[this.i]);
+        turn.start();
         availableMoves.delete()
         withinRange.delete();
         pane.image.src = turn.hero.sprite.src;

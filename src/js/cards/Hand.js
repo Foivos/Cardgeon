@@ -5,6 +5,7 @@ import { mouseover, mouseout, mousedown } from './CardEventHandlers.js';
 import { pane } from '../core/Pane.js';
 import { withinRange } from '../turn/WithinRange.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
+import { renderer } from '../core/Renderer.js';
 
 class Hand extends CardSet{
     constuctor() {
@@ -33,9 +34,11 @@ class Hand extends CardSet{
      */
     push(card, i=null) {
         super.push(card, i);
+        card.elem.style.display = 'block';
         card.elem.onmouseover = mouseover;
         card.elem.onmouseout = mouseout.bind(card);
         card.elem.onmousedown = mousedown.bind(card);
+        this.position();
     }
     /**
      * Removes a card from the hand.
@@ -47,12 +50,18 @@ class Hand extends CardSet{
         card.elem.onmouseout = null;
     }
 
+    pop() {
+        var card = super.pop();
+        card.hide();
+        return card;
+    }
+
     select(card) {
         this.deselect();
         this.selected = card;
         card.moveTo(pane.getCardPos(), 50);
         this.remove(card);
-        if(movingCreatures.length === 0) withinRange.calculate(card.range);
+        if(movingCreatures.length === 0 && card.range) withinRange.calculate(card.range);
     }
 
     deselect(i=0) {

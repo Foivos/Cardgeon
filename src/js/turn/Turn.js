@@ -1,3 +1,4 @@
+import { hand } from '../cards/Hand.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { availableMoves } from './AvailableMoves.js';
 import { withinRange } from './WithinRange.js';
@@ -20,6 +21,32 @@ export class Turn {
         this.remainingMove -= path[path.length-1].d;
         availableMoves.delete();
         withinRange.delete();
+    }
+
+    start() {
+        for(var i=0; i<7; i++) {
+            this.drawCard();
+        }
+    }
+
+    end() {
+        hand.deselect();
+        while(hand.length > 0) {
+            this.hero.discardPile.push(hand.pop());
+        }
+    }
+
+    drawCard() {
+        if(this.hero.drawPile.length === 0 && this.hero.discardPile.length === 0) return;
+        if(hand.length + hand.selected ? 1 : 0 >= 10) return;
+        if(this.hero.drawPile.length === 0) {
+            while(this.hero.discardPile.length > 0) {
+                this.hero.drawPile.push(this.hero.discardPile.pop());
+            }
+            this.hero.drawPile.shuffle();
+        }
+        var card = this.hero.drawPile.draw();
+        hand.push(card);
     }
 }
 

@@ -4,18 +4,14 @@ import { creatureSet } from '../creatures/CreatureSet.js'
 import { selectedCreature } from '../creatures/SelectedCreature.js';
 import { availableMoves } from '../turn/AvailableMoves.js';
 import { getTime } from './Utils.js';
-import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { turn } from '../turn/Turn.js';
 import { mouse } from './Mouse.js';
-import { withinRange } from '../turn/WithinRange.js';
 import { hand } from '../cards/Hand.js';
 
 class Grid {
     constructor() {
         this.canvas = document.createElement('canvas');
-        this.canvas.id = 'canvas';
-        this.canvas.style.margin = 0;
-        this.canvas.style.backgroundColor = 'rgb(158, 154, 161)';
+        this.canvas.className = 'grid';
         this.resize();
         this.ctx = this.canvas.getContext('2d');
         this.x = 0;

@@ -35,7 +35,9 @@ export class Card {
         frame.onload = function(){
             var ctx = this.elem.getContext('2d');
             ctx.drawImage(frame, 0, 0);
-            
+            ctx.font = '20px serif';
+            ctx.fontFamily = '"Lucida Console", Courier, monospace';
+            ctx.fillText(data.name, 40, 20);
             var art = new Image();
             art.onload = function(){
                 ctx.drawImage(art, 16, 50);

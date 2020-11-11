@@ -1,0 +1,14 @@
+{
+  "name": "cardgeon",
+  "version": "0.0.0",
+  "description": "A co-op card dungeon crawler",
+  "scripts": {
+    "start": "start"
+  },
+  "author": "Foivos",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

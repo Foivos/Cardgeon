@@ -1,6 +1,6 @@
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { availableMoves } from './AvailableMoves.js';
-import { targetedSquares } from './TargetedSquares.js';
+import { withinRange } from './WithinRange.js';
 
 export class Turn {
     constructor() {
@@ -19,7 +19,7 @@ export class Turn {
         movingCreatures.push(this.hero, path, onFinish);
         this.remainingMove -= path[path.length-1].d;
         availableMoves.delete();
-        targetedSquares.delete();
+        withinRange.delete();
     }
 }
 

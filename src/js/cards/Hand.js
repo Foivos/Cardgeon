@@ -3,7 +3,7 @@ import { cardPositions } from './CardPositions.js';
 import { Card } from './Card.js';
 import { mouseover, mouseout, mousedown } from './CardEventHandlers.js';
 import { pane } from '../core/Pane.js';
-import { targetedSquares } from '../turn/TargetedSquares.js';
+import { withinRange } from '../turn/WithinRange.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 
 class Hand extends CardSet{
@@ -52,13 +52,13 @@ class Hand extends CardSet{
         this.selected = card;
         card.moveTo(pane.getCardPos(), 50);
         this.remove(card);
-        if(movingCreatures.length === 0) targetedSquares.calculate(card.range);
+        if(movingCreatures.length === 0) withinRange.calculate(card.range);
     }
 
     deselect(i=0) {
         if(this.selected) this.push(this.selected, i);
         delete this.selected;
-        targetedSquares.delete();
+        withinRange.delete();
     }
 };
 

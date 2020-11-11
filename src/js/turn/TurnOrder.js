@@ -1,7 +1,7 @@
 import { availableMoves } from './AvailableMoves.js';
 import { pane } from '../core/Pane.js';
 import { turn } from './Turn.js';
-import { targetedSquares } from './TargetedSquares.js';
+import { withinRange } from './WithinRange.js';
 
 class TurnOrder extends Array{
     constructor() {
@@ -13,7 +13,7 @@ class TurnOrder extends Array{
         this.i = (this.i+1) % this.length;
         turn.set(this[this.i]);
         availableMoves.delete()
-        targetedSquares.delete();
+        withinRange.delete();
         pane.image.src = turn.hero.sprite.src;
     }
 

@@ -4,7 +4,7 @@ import { hand } from '../cards/Hand.js';
 import { DistanceMap } from '../core/Containers.js';
 import { creatureSet } from '../creatures/CreatureSet.js';
 
-class TargetedSquares extends DistanceMap{
+class WithinRange extends DistanceMap{
     constructor() {
         super()
     }
@@ -42,4 +42,4 @@ class TargetedSquares extends DistanceMap{
     }
 }
 
-export var targetedSquares = new TargetedSquares();
+export var withinRange = new WithinRange();

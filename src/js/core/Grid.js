@@ -7,7 +7,7 @@ import { getTime } from './Utils.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { turn } from '../turn/Turn.js';
 import { mouse } from './Mouse.js';
-import { targetedSquares } from '../turn/TargetedSquares.js';
+import { withinRange } from '../turn/WithinRange.js';
 import { hand } from '../cards/Hand.js';
 
 class Grid {
@@ -75,12 +75,12 @@ function onmouseup(e) {
     var creature = creatureSet.occupying(x, y);
     if(creature) {
         selectedCreature.set(creature);
-        if(hand.selected && hand.selected.range && targetedSquares.get(x, y)) {
-            if(targetedSquares.withinRange(x,y)) {
+        if(hand.selected && hand.selected.range && withinRange.get(x, y)) {
+            if(withinRange.withinRange(x,y)) {
                 hand.selected.activate(creature);
             }
             else {
-                var path = targetedSquares.getPathTo(x, y);
+                var path = withinRange.getPathTo(x, y);
                 turn.move(path, hand.selected.activate.bind(null, creature));
             }
         }

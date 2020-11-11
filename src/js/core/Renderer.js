@@ -7,7 +7,7 @@ import { selectedCreature } from '../creatures/SelectedCreature.js'
 import { availableMoves } from '../turn/AvailableMoves.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { turn } from '../turn/Turn.js';
-import { targetedSquares } from '../turn/TargetedSquares.js';
+import { withinRange } from '../turn/WithinRange.js';
 import { CardSet } from '../cards/CardSet.js';
 
 class Renderer {
@@ -103,17 +103,17 @@ class Renderer {
             }
         }
 
-        for (var i=0; i<targetedSquares.length; i++) {
-            if(!targetedSquares[i]) continue;
-            var x = targetedSquares.getX(i);
-            var y = targetedSquares.getY(i);
+        for (var i=0; i<withinRange.length; i++) {
+            if(!withinRange[i]) continue;
+            var x = withinRange.getX(i);
+            var y = withinRange.getY(i);
             grid.ctx.fillStyle = 'rgb(255, 100, 100)';
             grid.ctx.fillRect((x-grid.x) * grid.d, (y-grid.y) * grid.d, grid.d, grid.d);
             if(numbers) {
                 grid.ctx.globalAlpha = 1;
                 grid.ctx.font = "20px Arial";
-                grid.ctx.fillText(targetedSquares[i][0], (x-grid.x+0.5) * grid.d, (y-grid.y+1) * grid.d);
-                if(targetedSquares.nvars > 1) grid.ctx.fillText(targetedSquares[i][1], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
+                grid.ctx.fillText(withinRange[i][0], (x-grid.x+0.5) * grid.d, (y-grid.y+1) * grid.d);
+                if(withinRange.nvars > 1) grid.ctx.fillText(withinRange[i][1], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
                 grid.ctx.globalAlpha = 0.2;
             }
         }
@@ -138,7 +138,7 @@ class Renderer {
                     availableMoves.calculate();
                 }
                 if(hand.selected && hand.selected.range) {
-                    targetedSquares.calculate(hand.selected.range);
+                    withinRange.calculate(hand.selected.range);
                 }
                 turn.moving = false;
                 continue;

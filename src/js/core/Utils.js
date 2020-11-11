@@ -11,6 +11,6 @@ export function getInfo(name, execute) {
             if(execute) execute(data);
         }
     };
-    xhttp.open('GET', name + '.json', true);
+    xhttp.open('GET', 'res/' + name + '.json', true);
     xhttp.send();
 }

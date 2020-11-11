@@ -23,6 +23,7 @@ js: 'src/js',
 json: 'res',
 };
 
+
 http.createServer(function (req, res) {
 	var reqpath = req.url.toString().split('?')[0];
 	if (req.method !== 'GET') {
@@ -39,9 +40,8 @@ http.createServer(function (req, res) {
 	var Folders = folders[type];
 	if(!Array.isArray(Folders)) Folders = [Folders];
 	for(var i=0; i<Folders.length; i++) {
-		var dir = path.join(__dirname, Folders[i]);
+		var dir = path.join(__dirname, '');
 		var file = path.join(dir, reqpath);
-		console.log('Accessing ' + file + ' in response.');
 		if (file.indexOf(dir + path.sep) !== 0) {
 			res.statusCode = 403;
 			res.setHeader('Content-Type', 'text/plain');

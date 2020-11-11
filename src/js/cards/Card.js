@@ -1,11 +1,14 @@
 import { renderer } from '../core/Renderer.js';
 import { getInfo } from '../core/Utils.js';
+import { hand } from './Hand.js';
 
 
 
 export class Card {
-    static W=256*0.75;
-    static H=378*0.75;
+    static W=300;
+    static H=450;
+    static scaleB=1;
+    static scaleS=0.75;
     static nextId = 0;
     constructor(name) {
         this.id = Card.nextId++;
@@ -31,11 +34,11 @@ export class Card {
         var frame = new Image();
         frame.onload = function(){
             var ctx = this.elem.getContext('2d');
-            ctx.scale(0.75, 0.75);
             ctx.drawImage(frame, 0, 0);
+            
             var art = new Image();
             art.onload = function(){
-                ctx.drawImage(art, 20, 20);
+                ctx.drawImage(art, 16, 50);
             }.bind(this);
             art.src = 'art/' + data.art + '.png';
         }.bind(this);
@@ -48,10 +51,10 @@ export class Card {
      * @param {object} pos 
      */
     setPos(pos) {
+        this.setScale(pos.scale);
         this.setX(pos.x);
         this.setY(pos.y);
         this.setDeg(pos.deg);
-        this.setScale(pos.scale);
         this.target = {};
     }
     
@@ -80,12 +83,12 @@ export class Card {
 
     setX(x) {
         this.pos.x = x;
-        this.elem.style.left = x-Card.W/2  + 'px'
+        this.elem.style.left = x-Card.W*this.getScale()/2  + 'px'
     }
 
     setY(y) {
         this.pos.y = y;
-        this.elem.style.top = y-Card.H/2 + 'px'
+        this.elem.style.top = y-Card.H*this.getScale()/2 + 'px'
     }
 
     setDeg(deg) {
@@ -138,4 +141,12 @@ export class Card {
         this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
         delete renderer.movingCards[this.id];
     }
+
+    static setScales() {
+        var w = document.body.clientWidth;
+        this.scaleB = w/this.W/7.7;
+        this.scaleS = this.scaleB*0.7;
+    }
 };
+
+Card.setScales();

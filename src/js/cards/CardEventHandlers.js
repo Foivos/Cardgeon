@@ -69,10 +69,10 @@ export function mousedown(e){
     e = e || window.event;
     e.preventDefault();
     delete hand.hovered;
+    this.setScale(Card.scaleB);
     this.setX(e.clientX);
     this.setY(e.clientY);
     this.setDeg(0);
-    this.setScale(1);
     hand.moving = this;
     delete renderer.movingCards[hand.moving.id]
     document.onmouseup = mouseup.bind(hand.selected === this);
@@ -92,8 +92,8 @@ export function mouseover(e) {
     for(i=hand.length-1;i>0;i--) {
         var x=e.clientX , y=e.clientY, rad, pos=hand[i-1].pos, dx, dy;
         rad = pos.deg / 180 * Math.PI;
-        dx=-Card.W/2*Math.cos(rad)+Card.H/2*Math.sin(rad);
-        dy=-Card.W/2*Math.sin(rad)-Card.H/2*Math.cos(rad);
+        dx=-Card.W*Card.scaleS/2*Math.cos(rad)+Card.H*Card.scaleS/2*Math.sin(rad);
+        dy=-Card.W*Card.scaleS/2*Math.sin(rad)-Card.H*Card.scaleS/2*Math.cos(rad);
         if(-Math.tan(rad)*(y-pos.y-dy)+pos.x+dx > x) break;
     }
     var card = hand[i];

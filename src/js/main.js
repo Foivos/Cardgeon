@@ -19,14 +19,13 @@ creatureSet[1].y = 1;
 creatureSet[2].x = 1;
 creatureSet[2].y = 5;
 
-turnOrder.push(mew);
-turnOrder.start();
 
 for(var i=0; i<10; i++) {
     mew.drawPile.push(new Card('strike'));
     mew.drawPile.push(new Card('defend'));
 }
 mew.drawPile.shuffle();
-for(var i=0; i<7; i++) {
-    hand.push(mew.drawPile.draw());
-}
+
+turnOrder.push(mew);
+turnOrder.start();
+

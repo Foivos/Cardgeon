@@ -9,6 +9,7 @@ import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { turn } from '../turn/Turn.js';
 import { withinRange } from '../turn/WithinRange.js';
 import { CardSet } from '../cards/CardSet.js';
+import { Card } from '../cards/Card.js';
 
 class Renderer {
     constructor() {
@@ -18,8 +19,9 @@ class Renderer {
     }
 
     resize() {
-        grid.resize();
+        Card.setScales();
         pane.resize();
+        grid.resize();
         hand.position();
     }
 
@@ -29,7 +31,7 @@ class Renderer {
         this.advanceCreatures();
 
         this.clearGrid();
-        this.drawHighlighs(true);
+        this.drawHighlighs();
         this.drawCreatures();
         this.drawGrid();
     }
@@ -94,7 +96,7 @@ class Renderer {
             var y = availableMoves.getY(i);
             grid.ctx.fillStyle = 'rgb(100, 100, 255)';
             grid.ctx.fillRect((x-grid.x) * grid.d, (y-grid.y) * grid.d, grid.d, grid.d);
-            if(numbers && false) {
+            if(numbers) {
                 grid.ctx.globalAlpha = 1;
                 grid.ctx.font = "20px Arial";
                 grid.ctx.strokeStyle = 'black';

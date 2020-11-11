@@ -10,12 +10,6 @@ export class Turn {
         this.actions = 0;
     }
 
-    set(hero) {
-        this.hero = hero;
-        this.actions = hero.actions;
-        this.remainingMove = 0;
-    }
-
     move(path, onFinish) {
         movingCreatures.push(this.hero, path, onFinish);
         this.remainingMove -= path[path.length-1].d;
@@ -23,8 +17,11 @@ export class Turn {
         withinRange.delete();
     }
 
-    start() {
-        for(var i=0; i<7; i++) {
+    start(hero) {
+        this.hero = hero;
+        this.actions = hero.actions;
+        this.remainingMove = 0;
+        for(var i=0; i<10; i++) {
             this.drawCard();
         }
     }

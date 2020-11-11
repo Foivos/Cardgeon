@@ -1,14 +1,18 @@
+import { Card } from '../cards/Card.js';
+import { hand } from '../cards/Hand.js';
 import { end, move } from './PaneEventHandlers.js'
 
 class Pane {
     constructor() {
-        this.W = 200;
         this.elem = document.createElement('div');
-        this.elem.style.width = this.W;
-        this.elem.style.height = document.body.clientHeight;
         this.elem.className = 'pane';
         
-        this.resize();
+        this.H = document.body.clientHeight;
+        this.W = Math.floor(document.body.clientWidth / 7.7);
+        this.elem.style.width = this.W;
+        this.elem.style.height = document.body.clientHeight;
+        this.elem.style.top = 0;
+        this.elem.style.left = document.body.clientWidth - this.W;
         
         this.h0 = this.W + 40;
         this.makeButton('move', move);
@@ -35,10 +39,19 @@ class Pane {
     }
     resize() {
         this.H = document.body.clientHeight;
-        this.elem.width = this.W;
-        this.elem.height = this.H;
+        this.W = Math.floor(document.body.clientWidth / 7.7);
+        this.elem.style.width = this.W;
+        this.elem.style.height = document.body.clientHeight;
         this.elem.style.top = 0;
         this.elem.style.left = document.body.clientWidth - this.W;
+        var buttons = this.elem.getElementsByClassName('paneButton');
+        for(var i=0; i<buttons.length; i++) {
+            buttons[i].style.width = this.W-20;
+            buttons[i].style.top = this.W + 50 * i + 40;
+        }
+        this.image.style.width = this.W-20;
+        this.image.style.height = this.W-20;
+        if(hand.selected) hand.selected.setPos(this.getCardPos());
     }
     makeButton(name, onclick) {
         var button = document.createElement('button');
@@ -59,7 +72,7 @@ class Pane {
     }
 
     getCardPos() {
-        return {x:document.body.clientWidth-this.W/2, y:700, deg:0, scale:1};
+        return {x:document.body.clientWidth-this.W/2, y:document.body.clientHeight - Card.H*Card.scaleB/2, deg:0, scale:Card.scaleB};
     }
 };
 

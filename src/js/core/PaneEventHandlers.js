@@ -12,7 +12,7 @@ import { movingCreatures } from '../creatures/MovingCreatures.js';
 export function move() {
     if(turn.actions <= 0) return;
     turn.actions--;
-    turn.remainingMove += turn.hero.speed;
+    turn.remainingMove += turn.hero.stats.get('speed');
     if(movingCreatures.length > 0) return;
     if(turn.remainingMove >= 1) availableMoves.calculate();
     if(hand.selected && hand.selected.range) withinRange.calculate(hand.selected.range);

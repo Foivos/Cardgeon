@@ -1,4 +1,6 @@
 import { grid } from '../core/Grid.js';
+import { Stats } from '../effects/Stats.js';
+import { Tags } from '../effects/Tags.js';
 
 export class Creature {
     constructor(image) {
@@ -6,27 +8,30 @@ export class Creature {
         this.y = 1;
         this.sprite = new Image();
         this.sprite.src = 'res/' + image + '.png';
-        this.speed = 4;
-        this.hp = 100;
-        this.armour = 0;
+        this.stats = new Stats();
+        this.tags = new Tags();
     }
 
     damage(n, source) {
-        this.armour -= n;
-        if(this.armour < 0) {
-            this.hp += this.armour;
-            this.armour = 0;
+        var armour = this.stats.get('armour');
+        var hp = this.stats.get('hp');
+        armour -= n;
+        if(armour < 0) {
+            hp += armour;
+            armour = 0;
         }
         if(this.hp <= 0) {
             this.die();
         }
+        this.stats.set('hp', hp);
+        this.stats.set('armour', armour);
     }
 
     applyArmour(n) {
-        this.armour += n;
+        this.stats.modify('armour', n);
     }
 
     die() {
-        console.log(this);
+        console.log(this, 'has died');
     }
 };

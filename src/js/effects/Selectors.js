@@ -1,3 +1,4 @@
+import { asArray } from '../core/Utils.js';
 import { creatureSet } from '../creatures/CreatureSet.js';
 import { turn } from '../turn/Turn.js'
 import { withinRange } from '../turn/WithinRange.js';
@@ -10,6 +11,17 @@ export const selectorMaps = {
     },
     self : {
         selector : self,
+    },
+    evaluate : {
+        selector : evaluate,
+        vars : 'parts',
+    },
+    getStat : {
+        selector : getStat,
+        vars : [
+            'target',
+            'stat'
+        ],
     },
 }
 
@@ -25,4 +37,12 @@ function single(range) {
 
 function self() {
     resolver.send(turn.hero);
+}
+
+function evaluate(parts) {console.log(''.concat(...parts));
+    resolver.send(eval(''.concat(...parts)));
+}
+
+function getStat(target, stat) {console.log(target, stat);
+    resolver.send(target.stats.get(stat));
 }

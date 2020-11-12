@@ -38,7 +38,7 @@ export function getLines(ctx, text, maxWidth) {
 
 export function asArray(a, n = 1) {
     if(n <= 1) {
-        if(a == null || typeof a == 'undefinded') return [];
+        if(a === null || typeof a === 'undefinded') return [];
         return Array.isArray(a) ? a : [a];
     }
     if(!Array.isArray(a)) {

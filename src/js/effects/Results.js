@@ -20,6 +20,10 @@ export const resultMaps = {
         result : target,
         vars : 'selectors',
     },
+    test : {
+        result : test,
+        vars : ['arg1', 'arg2'],
+    }
 }
 
 function damage (target, damage) {
@@ -37,3 +41,7 @@ function armour(target, armour) {
 }
 
 function target() {};
+
+function test(arg1, arg2) {
+    console.log(arg1,arg2);
+}

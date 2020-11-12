@@ -55,9 +55,11 @@ class Resolver {
     addSelectorsRecursive(selector) {
         var vars = asArray(selectorMaps[selector.selector].vars);
         for(var i=0; i<vars.length; i++) {
-            if(selector[vars[i]].selector) {
-                addSelectorsRecursive(selector[vars[i]])
-
+            var values = asArray(selector[vars[i]])
+            for(var j=0; j<values.length; j++) {
+                if(values[j].selector) {
+                    this.addSelectorsRecursive(values[j]);
+                }
             }
         }
         if(!selector.id) selector.id = '#' + this.i + ':' + this.selectors.length;
@@ -101,12 +103,16 @@ class Resolver {
         var r = [];
         for(var i=0; i<keys.length; i++) {
             var value = data[keys[i]];
-            if(value.selector) {
-                r.push(this.selectorIDs[value.id]);
+            if(value.id) {
+                value = this.selectorIDs[value.id];
+            } else if(Array.isArray(value)) {
+                for(var j=0; j<value.length; j++) {
+                    if(value[j].id) {
+                        value[j] = this.selectorIDs[value[j].id]
+                    }
+                }
             }
-            else {
-                r.push(value);
-            }
+            r.push(value);
         }
         f(...args, ...r);
     }

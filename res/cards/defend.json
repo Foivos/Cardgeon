@@ -1,16 +1,13 @@
 {
     "name" : "Defend",
     "art" : "defend",
-    "text" : "Gain 5 Armor",
-    "targets" : [
-        {
-            "type" : "self"
+    "text" : "Gain 5 Armour.",
+    "actions" : 1,
+    "results" : {
+        "result" : "armour",
+        "armour" : 5,
+        "target" : {
+            "selector" : "self"
         }
-    ],
-    "effects" : [
-        {
-            "type" : "block",
-            "armor" : 5
-        }
-    ]
+    }
 }

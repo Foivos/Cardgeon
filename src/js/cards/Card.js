@@ -1,5 +1,6 @@
 import { renderer } from '../core/Renderer.js';
-import { getInfo } from '../core/Utils.js';
+import { getInfo, getLines } from '../core/Utils.js';
+import { resolver } from '../effects/Resolver.js';
 import { hand } from './Hand.js';
 
 
@@ -30,12 +31,20 @@ export class Card {
     }
 
     init(data) {
-        this.range = data.targets[0].range;
+        this.results = data.results;
         var frame = new Image();
         frame.onload = function(){
             var ctx = this.elem.getContext('2d');
             ctx.drawImage(frame, 0, 0);
-            
+            ctx.font = '32px monospace';
+            ctx.fillText(data.name, 52, 37);
+            ctx.font = '50px monospace';
+            ctx.fillText(data.actions, 12, 41);
+            ctx.font = '20px monospace';
+            var lines = getLines(ctx, data.text, 262);
+            for(var i=0; i<lines.length; i++) {
+                ctx.fillText(lines[i], 20, 270+20*i, 262);
+            }
             var art = new Image();
             art.onload = function(){
                 ctx.drawImage(art, 16, 50);
@@ -132,8 +141,8 @@ export class Card {
         this.setScale(this.getScale() + dScale)
     }
 
-    activate(target) {
-        target.hp -= 10;
+    activate() {
+        resolver.proccess(this.results);
     }
 
     hide() {

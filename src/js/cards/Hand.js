@@ -46,8 +46,8 @@ class Hand extends CardSet{
      */
     remove(card) {
         super.remove(card);
-        card.elem.onmouseover = null;
-        card.elem.onmouseout = null;
+        delete card.elem.onmouseover;
+        delete card.elem.onmouseout;
     }
 
     pop() {

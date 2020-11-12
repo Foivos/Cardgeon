@@ -49,8 +49,8 @@ class Renderer {
 
     drawGrid() {
         grid.ctx.font = "30px Arial";
-        grid.ctx.beginPath()
-        grid.ctx.lineWidth = 0.3
+        grid.ctx.beginPath();
+        grid.ctx.lineWidth = 0.3;
         grid.ctx.strokeStyle = 'black';
         for(var f = Math.ceil(grid.x)*grid.d-grid.x*grid.d; f<grid.canvas.width; f+=grid.d) {
             grid.ctx.moveTo(f,0);

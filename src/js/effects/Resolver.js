@@ -1,101 +1,82 @@
 import { selectorMaps } from './Selectors.js';
 import { resultMaps } from './Results.js'
-import { turn } from '../turn/Turn.js';
+import { asArray } from '../core/Utils.js';
 
 class Resolver {
     constructor() {
         this.init();
     }
 
-    init(results) {
-        this.results = Array.isArray(results) ? results : [results]
+    init(results, whenDone) {
+        this.results = asArray(results);
         this.selected = [];
         this.selectors = [];
         this.selectorIDs = {};
+        this.whenDone = whenDone;
+        this.vars = [[]];
         this.i = 0;
+        this.j = 0;
     }
 
     resolve() {
-        this.i=0;
-        for(var i=0; i<this.results.length; i++) {
-            var result = this.results[i];
-            var map = resultMaps[result.result];
-            if(!map.vars) {
-                map.result();
-                continue;
-            }
-            if(!Array.isArray(map.vars)) {
-                if(result[map.vars].selector) {
-                    map.result(this.selected[this.i++]);
-                }
-                else if(result[map.vars].id) {
-                    map.result( this.selectorIDs[ result[map.vars].id ] );
-                }
-                else {
-                    map.result[result[map.vars]];
-                }
-            }
-            else {
-                var vars = [];
-                for(var j=0; j<map.vars.length; j++) {
-                    if(result[map.vars[j]].selector) {
-                        vars.push(this.selected[this.i++]);
-                    }
-                    else if(result[map.vars[j]].id) {
-                        vars.push( this.selectorIDs[ result[map.vars[j]].id ] );
-                    }
-                    else {
-                        vars.push(result[map.vars[j]]);
-                    }
-                }
-                map.result(...vars);
-            }
-            
-        }
-        console.log(turn.hero.armour)
-    }
-
-    proccess(results) {
-        this.init(results);
-        for(var i=0; i<this.results.length; i++) {
-            var result = this.results[i];
-            var map = resultMaps[result.result];
-            if(!map.vars) continue;
-            if(!Array.isArray(map.vars)) {
-                if(result[map.vars].selector) {
-                    this.selectors.push(result[map.vars]);
-                }
-            }
-            else {
-                for(var j=0; j<map.vars.length; j++) {
-                    if(result[map.vars[j]].selector) {
-                        this.selectors.push(result[map.vars[j]]);
-                    } 
-                }
-            }
-        }
-        if(this.selectors.length === 0) {
-            this.resolve();
+        this.j = 0;
+        var result = this.results[this.i];
+        var map = resultMaps[result.result];
+        this.applyDynamicFunction(map.result, result, map.vars);
+        this.i++;
+        if(this.i < this.results.length) {
+            this.nextResult();
         }
         else {
-            this.nextSelector();
+            this.whenDone();
         }
+    }
+
+    proccess(results, whenDone) {
+        this.init(results, whenDone);
+        this.nextResult();
+    }
+
+    nextResult() {
+        this.vars = asArray(resultMaps[this.results[this.i].result].vars);
+        var result = this.results[this.i];
+        for(var i=0; i<this.vars.length; i++) {
+            var value = asArray(result[this.vars[i]]);
+            for(var j=0; j<value.length; j++) {
+                if(value[j].selector) {
+                    this.addSelectorsRecursive(value[j]);
+                }
+            }
+        }
+        this.j = 0;
+        this.nextSelector();
+    }
+
+    addSelectorsRecursive(selector) {
+        var vars = asArray(selectorMaps[selector.selector].vars);
+        for(var i=0; i<vars.length; i++) {
+            if(selector[vars[i]].selector) {
+                addSelectorsRecursive(selector[vars[i]])
+
+            }
+        }
+        if(!selector.id) selector.id = '#' + this.i + ':' + this.selectors.length;
+        this.selectors.push(selector);
     }
 
     nextSelector() {
-        var selector = this.selectors[this.i];
+        var selector = this.selectors[this.j];
         var map = selectorMaps[selector.selector];
         this.applyDynamicFunction(map.selector, selector, map.vars);
     }
     
 
     send(selected) {
-        this.selected.push(selected);
-        if(this.selectors[this.i].id) {
-            this.selectorIDs[this.selectors[this.i].id] = this.i; 
+        if(this.selectors[this.j].id) {
+            this.selectorIDs[this.selectors[this.j].id] = selected; 
         }
-        this.i++
-        if(this.i < this.results.length) {
+        this.j++;
+        if(this.j < this.selectors.length) {
             this.nextSelector();
         }
         else {
@@ -116,19 +97,18 @@ class Resolver {
      * @param  {...any} args Additional arguments.
      */
     applyDynamicFunction(f, data, keys, ...args) {
-        if(!keys) {
-            f(...args);
-            return;
+        keys = asArray(keys);
+        var r = [];
+        for(var i=0; i<keys.length; i++) {
+            var value = data[keys[i]];
+            if(value.selector) {
+                r.push(this.selectorIDs[value.id]);
+            }
+            else {
+                r.push(value);
+            }
         }
-        if(!Array.isArray(keys)) {
-            f(...args, data[keys]);
-        }
-        else {
-            var temp = [];
-            for(var i=0; i<vars.length; i++) temp.push(data[keys[i]]);
-            f(...args, ...vars);
-        }
-
+        f(...args, ...r);
     }
 }
 

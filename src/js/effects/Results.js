@@ -1,3 +1,4 @@
+import { asArray } from '../core/Utils.js';
 import { Creature } from '../creatures/Creature.js';
 
 export const resultMaps = {
@@ -14,19 +15,25 @@ export const resultMaps = {
             'target',
             'armour',
         ]
-    }
+    },
+    target : {
+        result : target,
+        vars : 'selectors',
+    },
 }
 
 function damage (target, damage) {
-    target = Array.isArray(target) ? target : [target];
+    target = asArray(target);
     for(var i=0; i<target.length; i++) {
         target[i].damage(damage);
     }
 }
 
 function armour(target, armour) {
-    target = Array.isArray(target) ? target : [target];
+    target = asArray(target);
     for(var i=0; i<target.length; i++) {
         target[i].applyArmour(armour);
     }
 }
+
+function target() {};

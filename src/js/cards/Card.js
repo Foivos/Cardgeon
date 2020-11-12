@@ -1,6 +1,7 @@
 import { renderer } from '../core/Renderer.js';
 import { getInfo, getLines } from '../core/Utils.js';
 import { resolver } from '../effects/Resolver.js';
+import { turn } from '../turn/Turn.js';
 import { hand } from './Hand.js';
 
 
@@ -142,13 +143,22 @@ export class Card {
     }
 
     activate() {
-        resolver.proccess(this.results);
+        resolver.proccess(this.results, this.discard.bind(this));
     }
 
     hide() {
         this.elem.style.display = 'none';
         this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
         delete renderer.movingCards[this.id];
+    }
+
+    discard() {
+        hand.remove(this);
+        if(hand.moving === this) delete hand.moving;
+        if(hand.hovered === this) delete hand.hovered;
+        if(hand.selected === this) delete hand.selected;
+        turn.hero.discardPile.push(this);
+        this.hide();
     }
 
     static setScales() {

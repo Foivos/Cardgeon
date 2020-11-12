@@ -29,7 +29,7 @@ export class Turn {
     end() {
         hand.deselect();
         while(hand.length > 0) {
-            this.hero.discardPile.push(hand.pop());
+            hand[0].discard();
         }
     }
 

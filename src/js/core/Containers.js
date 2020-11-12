@@ -128,7 +128,7 @@ export class DistanceMap extends Array{
             var Next = this.findAdjecent(cur.x, cur.y);
             for(var j=0; j<Next.length; j++) {
                 var next = Next[j];
-                if(cur.d + next.d > this.d) continue;
+                if(Math.floor(cur.d + next.d) > this.d) continue;
                 var i = this.getI(next.x, next.y);
                 if(!this[i]) {
                     this[i] = [];

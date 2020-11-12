@@ -34,3 +34,19 @@ export function getLines(ctx, text, maxWidth) {
     lines.push(currentLine);
     return lines;
 }
+
+
+export function asArray(a, n = 1) {
+    if(n <= 1) {
+        if(a == null || typeof a == 'undefinded') return [];
+        return Array.isArray(a) ? a : [a];
+    }
+    if(!Array.isArray(a)) {
+        return [asArray(a, n-1)];
+    }
+    var r = [];
+    for(var i=0; i<a.length; i++) {
+        r.push(asArray(a[i], n-1));
+    }
+    return r;
+}; 

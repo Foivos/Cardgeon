@@ -6,6 +6,7 @@ import { turnOrder } from './turn/TurnOrder.js';
 import { DistanceMap } from './core/Containers.js';
 import { getInfo } from './core/Utils.js';
 import { Creature } from './creatures/Creature.js';
+import { resolver } from './effects/Resolver.js';
 
 
 
@@ -28,4 +29,3 @@ mew.drawPile.shuffle();
 
 turnOrder.push(mew);
 turnOrder.start();
-

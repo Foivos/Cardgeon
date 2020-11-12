@@ -1,18 +1,14 @@
 {
     "name" : "Strike",
     "art" : "strike",
-    "text" : "Deal 5 Damage",
-    "targets" : [
-        {
-            "type" : "creature",
-            "number" : 1,
-            "range" : 1.5
+    "text" : "Deal 5 Damage.",
+    "actions" : 1,
+    "results" : {
+        "result" : "damage",
+        "damage" : 5,
+        "target" : {
+            "selector" : "single",
+            "range" : 1
         }
-    ],
-    "effects" : [
-        {
-            "type" : "damage",
-            "damage" : 5
-        }
-    ]
+    }
 }

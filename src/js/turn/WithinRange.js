@@ -24,20 +24,20 @@ class WithinRange extends DistanceMap{
             ];
             return adj.map(elem => ({x:x+elem.x, y:y+elem.y, d:elem.d}));
         }
-
-        if(availableMoves.length === 0) {
-            super.initSingle(d, turn.hero.x, turn.hero.y, f);
-        }
-        else {
-            super.initNested(availableMoves, d, f);
-        }
+        super.initSingle(d, turn.hero.x, turn.hero.y, f);
+        //super.initNested(availableMoves, d, f);
     }
 
-    getPathTo(x, y) {
+    delete(){
+        delete this.onSelect;
+        super.delete();
+    }
+
+    /*getPathTo(x, y) {
         return super.getPathTo(x, y, 0, this.d);
-    }
+    }*/
 
-    withinRange(x, y) {
+    reaches(x, y) {
         return this.get(x,y)[0] <= this.d;
     }
 }

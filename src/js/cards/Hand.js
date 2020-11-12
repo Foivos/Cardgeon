@@ -61,7 +61,7 @@ class Hand extends CardSet{
         this.selected = card;
         card.moveTo(pane.getCardPos(), 50);
         this.remove(card);
-        if(movingCreatures.length === 0 && card.range) withinRange.calculate(card.range);
+        card.activate();
     }
 
     deselect(i=0) {

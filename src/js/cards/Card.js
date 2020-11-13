@@ -20,8 +20,6 @@ export class Card {
         this.elem.id = 'card' + this.id;
         this.elem.width = Card.W;
         this.elem.height = Card.H;
-
-        this.pos = {};
         this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
         this.target = {};
         this.speed = 0;
@@ -65,60 +63,81 @@ export class Card {
         this.setX(pos.x);
         this.setY(pos.y);
         this.setDeg(pos.deg);
+        this.setTurnover(pos.turnover);
         this.target = {};
     }
     
     moveTo(pos, speed=10) {
-        if(pos.x===this.pos.x && pos.y===this.pos.y && pos.deg===this.pos.deg && pos.scale===this.pos.scale) {
-            return;
-        }
         this.target = pos;
         this.speed = speed;
         renderer.movingCards[this.id] = this;
     }
 
     getX() {
-        return this.pos.x;
+        return this.x;
     }
 
     getY() {
-        return this.pos.y;
+        return this.y;
     }
     getDeg() {
-        return this.pos.deg;
+        return this.deg;
     }
     getScale() {
-        return this.pos.scale;
+        return this.scale;
+    }
+    getTurnover() {
+        return this.turnover;
     }
 
     setX(x) {
-        this.pos.x = x;
+        this.x = x;
         this.elem.style.left = x-Card.W*this.getScale()/2  + 'px'
     }
 
     setY(y) {
-        this.pos.y = y;
+        this.y = y;
         this.elem.style.top = y-Card.H*this.getScale()/2 + 'px'
     }
 
     setDeg(deg) {
-        this.pos.deg = deg;
-        this.elem.style.transform = 'rotate(' + deg + 'deg)';
+        this.deg = deg;
+        this.setTransform();
     }
 
     setScale(scale) {
         if(!scale && scale !== 0) {
             console.trace();
         }
-        this.pos.scale = scale;
+        this.scale = scale;
         this.elem.style.width = Card.W*scale;
     }
 
+    setTurnover(turnover) {
+        if(!turnover) turnover = 0;
+        this.turnover = turnover;
+        this.setTransform();
+    }
+
+    setTransform() {
+        var plus = (1 + Math.cos(this.turnover * Math.PI / 2)) / 2;
+        var minus = (-1 + Math.cos(this.turnover * Math.PI / 2)) / 2;
+        var cos = Math.cos(this.deg / 180 * Math.PI);
+        var sin = Math.sin(this.deg / 180 * Math.PI);
+        var a = plus * cos - minus * sin;
+        var b = plus * sin + minus * cos;
+        var c = minus * cos - plus * sin;
+        var d = minus * sin + plus * cos;
+        var s = 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', 0, 0)';
+        this.elem.style.transform = s;
+    }
+
     advanceMove() {
-        var dx = this.target.x - this.pos.x;
-        var dy = this.target.y - this.pos.y;
-        var dDeg = this.target.deg - this.pos.deg;
-        var dScale = this.target.scale - this.pos.scale;
+        var dx = this.target.x - this.x;
+        var dy = this.target.y - this.y;
+        var dDeg = this.target.deg - this.deg;
+        var dScale = this.target.scale - this.scale;
+        var dTurnover = this.target.turnover - this.turnover;
         if(dx===0 && dy===0) {
             this.setDeg(this.target.deg);
             this.setScale(this.target.scale);
@@ -131,15 +150,16 @@ export class Card {
             delete renderer.movingCards[this.id];
         }
         else {
-            this.displace(dx*ratio, dy*ratio, dDeg*ratio, dScale*ratio);
+            this.displace(dx*ratio, dy*ratio, dDeg*ratio, dScale*ratio, dTurnover*ratio);
         }
     }
 
-    displace (dx, dy, dDeg=0, dScale=0) {
+    displace (dx, dy, dDeg=0, dScale=0, dTurnover = 0) {
         this.setX(this.getX() + dx);
         this.setY(this.getY() + dy);
         this.setDeg(this.getDeg() + dDeg);
         this.setScale(this.getScale() + dScale)
+        this.setTurnover(this.getTurnover() + dTurnover);
     }
 
     activate() {
@@ -158,13 +178,30 @@ export class Card {
         if(hand.hovered === this) delete hand.hovered;
         if(hand.selected === this) delete hand.selected;
         turn.hero.discardPile.push(this);
-        this.hide();
+        var pos = {
+            x : document.body.clientWidth + Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
+            y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
+            deg : 0,
+            scale : Card.scaleB,
+            turnover : 2,
+        }
+        this.elem.style.zIndex = 0;
+        this.moveTo(pos, 30);
     }
 
     static setScales() {
         var w = document.body.clientWidth;
         this.scaleB = w/this.W/7.7;
         this.scaleS = this.scaleB*0.7;
+    }
+
+    setHighlight(h) {
+        if(h) {
+
+        }
+        else {
+
+        }
     }
 };
 

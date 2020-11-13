@@ -1,4 +1,5 @@
 import { Card } from '../cards/Card.js';
+import { cardPositions } from '../cards/CardPositions.js';
 import { hand } from '../cards/Hand.js';
 import { end, move } from './PaneEventHandlers.js'
 
@@ -72,7 +73,12 @@ class Pane {
     }
 
     getCardPos() {
-        return {x:document.body.clientWidth-this.W/2, y:document.body.clientHeight - Card.H*Card.scaleB/2, deg:0, scale:Card.scaleB};
+        return {
+            x : document.body.clientWidth - this.W / 2, 
+            y : document.body.clientHeight - Card.H * Card.scaleB / 2 - Card.W * Card.scaleB, 
+            deg : 0, 
+            scale : Card.scaleB
+        };
     }
 };
 

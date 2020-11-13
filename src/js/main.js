@@ -9,6 +9,7 @@ import { Creature } from './creatures/Creature.js';
 import { resolver } from './effects/Resolver.js';
 import { evaluate } from './effects/Evaluator.js';
 import { turn } from './turn/Turn.js';
+import { pane } from './core/Pane.js';
 
 
 
@@ -32,3 +33,25 @@ mew.drawPile.shuffle();
 
 turnOrder.push(mew);
 turnOrder.start();
+
+
+/*var card = new Card('test');
+card.setPos({x: 500, y:500, scale:0.7, deg:0});
+
+var t = {t:0};
+
+setInterval(function(t) {
+    t.t+=0.01;
+    //if(t.t>3) t.t=0;
+    var t = t.t;// > 2 ? 0 : t.t;
+    var a, b, c, d, e=0, f =0;
+    var phi = Math.PI/4;
+    var cosphi = Math.cos(phi), sinphi = Math.sin(phi);
+    var costh = Math.cos(Math.PI*t/2);
+    a = cosphi ** 2 + sinphi ** 2 * costh;
+    b = -cosphi * sinphi * (1 - costh);
+    c = b;
+    d = sinphi ** 2 + cosphi **2 * costh;
+    var s = 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', ' + e + ', ' + f + ')';
+    this.elem.style.transform = s;
+}.bind(card,t), 10);*/

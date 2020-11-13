@@ -7,21 +7,6 @@ import { resolver } from './Resolver.js';
 export const selectorMaps = {
     single : {
         selector : single,
-        vars : 'range',
-    },
-    self : {
-        selector : self,
-    },
-    evaluate : {
-        selector : evaluate,
-        vars : 'parts',
-    },
-    getStat : {
-        selector : getStat,
-        vars : [
-            'target',
-            'stat'
-        ],
     },
 }
 
@@ -33,16 +18,4 @@ function single(range) {
         withinRange.delete();
         resolver.send(creature);
     }
-}
-
-function self() {
-    resolver.send(turn.hero);
-}
-
-function evaluate(parts) {
-    resolver.send(eval(''.concat(...parts)));
-}
-
-function getStat(target, stat) {
-    resolver.send(target.stats.get(stat));
 }

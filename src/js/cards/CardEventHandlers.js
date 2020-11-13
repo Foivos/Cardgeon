@@ -8,22 +8,14 @@ export function move(e) {
     e = e || window.event;
     e.preventDefault();
 
-    if(hand.selected && e.clientY > document.body.clientHeight-250) {
-        hand.moving = hand.selected;
-        hand.deselect();
-    }
     if(hand.moving) {
         hand.moving.setX(e.clientX);
         hand.moving.setY(e.clientY);
         
-        if(hand.moving.getY() < document.body.clientHeight-250) {
-            hand.deselect();
-            hand.select(hand.moving);
-            delete hand.moving;
-        }
-        else {
-            if(hand.selected) {
-                hand.deselect();
+        if(hand.reorderingFrom(e.clientX, e.clientY)) {
+            hand.highlight.style.display = 'none';
+            if(!hand.includes(hand.moving)) {
+                hand.push(hand.moving);
             }
             var i = hand.findIndex(elem => elem === hand.moving);
             while(i<hand.length-1 && hand.moving.getX()<hand[i+1].getX()) {
@@ -41,15 +33,26 @@ export function move(e) {
                 i--;
             }
         }
+        else {
+            hand.remove(hand.moving);
+            hand.highlight.style.display = 'block';
+            hand.highlight.style.width = Card.scaleB * Card.W * 1.01;
+            hand.highlight.style.top = hand.moving.getY() - Card.scaleB * Card.H / 2 * 1.01;
+            hand.highlight.style.left = hand.moving.getX() - Card.scaleB * Card.W / 2 * 1.01;
+        }
     }
     hand.position();
 }
 
-export function mouseup() {
-    // stop moving when mouse button is released:
+export function mouseup(e) {
+    if(!hand.reorderingFrom(e.clientX, e.clientY) && hand.moving) {
+        hand.deselect();
+        hand.select(hand.moving);
+    }
     document.onmouseup = null;
     document.onmousemove = null;
     delete hand.moving;
+    hand.highlight.style.display = 'none';
     hand.position();
 }
 /**
@@ -66,16 +69,17 @@ export function mouseout(e) {
  * @param {Event} e 
  */
 export function mousedown(e){
+    var card = hand.hovered || hand.selected;
     e = e || window.event;
     e.preventDefault();
     delete hand.hovered;
-    this.setScale(Card.scaleB);
-    this.setX(e.clientX);
-    this.setY(e.clientY);
-    this.setDeg(0);
-    hand.moving = this;
+    card.setScale(Card.scaleB);
+    card.setX(e.clientX);
+    card.setY(e.clientY);
+    card.setDeg(0);
+    hand.moving = card;
     delete renderer.movingCards[hand.moving.id]
-    document.onmouseup = mouseup.bind(hand.selected === this);
+    document.onmouseup = mouseup;
     hand.deselect();
     hand.position();
     document.onmousemove = move;
@@ -90,7 +94,7 @@ export function mouseover(e) {
     e.preventDefault();
     var i;
     for(i=hand.length-1;i>0;i--) {
-        var x=e.clientX , y=e.clientY, rad, pos=hand[i-1].pos, dx, dy;
+        var x=e.clientX , y=e.clientY, rad, pos=hand[i-1], dx, dy;
         rad = pos.deg / 180 * Math.PI;
         dx=-Card.W*Card.scaleS/2*Math.cos(rad)+Card.H*Card.scaleS/2*Math.sin(rad);
         dy=-Card.W*Card.scaleS/2*Math.sin(rad)-Card.H*Card.scaleS/2*Math.cos(rad);

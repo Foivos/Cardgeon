@@ -8,10 +8,17 @@ import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { renderer } from '../core/Renderer.js';
 
 class Hand extends CardSet{
-    constuctor() {
-        this.selected = {};
-        this.hovered = {};
-        this.moving = {};
+    constructor() {
+        super();
+
+        this.highlight = document.createElement('img');
+        this.highlight.src = 'res/highlight.png';
+        this.highlight.style.position = 'absolute';
+        this.highlight.style.top = 0;
+        this.highlight.style.left = 0;
+        this.highlight.style.zIndex = 20;
+        this.highlight.style.display = 'none';
+        document.body.appendChild(this.highlight);
     }
     
     /**
@@ -35,9 +42,9 @@ class Hand extends CardSet{
     push(card, i=null) {
         super.push(card, i);
         card.elem.style.display = 'block';
-        card.elem.onmouseover = mouseover;
-        card.elem.onmouseout = mouseout.bind(card);
-        card.elem.onmousedown = mousedown.bind(card);
+        card.elem.addEventListener('mouseover', mouseover);
+        card.elem.addEventListener('mouseout', mouseout);
+        card.elem.addEventListener('mousedown', mousedown);
         this.position();
     }
     /**
@@ -46,8 +53,8 @@ class Hand extends CardSet{
      */
     remove(card) {
         super.remove(card);
-        delete card.elem.onmouseover;
-        delete card.elem.onmouseout;
+        card.elem.removeEventListener('mouseover', mouseover);
+        card.elem.removeEventListener('mouseout', mouseout);
     }
 
     pop() {
@@ -67,7 +74,10 @@ class Hand extends CardSet{
     deselect(i=0) {
         if(this.selected) this.push(this.selected, i);
         delete this.selected;
-        withinRange.delete();
+    }
+
+    reorderingFrom(x, y) {
+        return y > document.body.clientHeight-Card.H*Card.scaleB && x < document.body.clientWidth - pane.W;
     }
 };
 

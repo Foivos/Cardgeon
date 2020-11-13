@@ -5,8 +5,8 @@ import { hand } from './Hand.js';
  * Returns an array of the card positions.
  * @param {number} N 
  */
-export function cardPositions(N) {
-    var dx = document.body.clientWidth/N/1.5;
+export function cardPositions(N) { if(N === 0) return [];
+    var dx = document.body.clientWidth/N/1.7;
     if(dx>Card.W*Card.scaleS*0.8) {
         dx=Card.W*Card.scaleS*0.8;
     }

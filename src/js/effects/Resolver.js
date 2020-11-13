@@ -1,10 +1,7 @@
 import { selectorMaps } from './Selectors.js';
-import { resultMaps } from './Results.js'
-import { asArray } from '../core/Utils.js';
 import { evaluate } from './Evaluator.js';
 import { turn } from '../turn/Turn.js';
 
-const operators = '+-*/%=>!<&|,]';
 
 class Resolver {
     constructor() {
@@ -87,15 +84,14 @@ class Resolver {
     send(selected) {
         var id = this.getId(this.selectors[this.j]);
         this.cache[id] = selected;
-        this.parsed = this.parsed.replaceAll(id, 'this.cache["' + id + '"]');
         this.j++;
         this.nextSelector();
     }
-    cancel() {
-    }
 
     resolve() {
-        this.j = 0;
+        for(var id in this.cache) { 
+            this.parsed = this.parsed.replaceAll(id, 'this.cache["' + id + '"]');
+        }
         evaluate.bind({s : this.parsed, cache : this.cache})(turn.hero);
         this.i++;
         if(this.i < this.results.length) {

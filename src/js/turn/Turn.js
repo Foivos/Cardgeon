@@ -21,7 +21,7 @@ export class Turn {
         this.hero = hero;
         this.actions = hero.actions;
         this.remainingMove = 0;
-        for(var i=0; i<10; i++) {
+        for(var i=0; i<7; i++) {
             this.drawCard();
         }
     }

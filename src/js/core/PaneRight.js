@@ -3,7 +3,7 @@ import { cardPositions } from '../cards/CardPositions.js';
 import { hand } from '../cards/Hand.js';
 import { end, move } from './PaneEventHandlers.js'
 
-class Pane {
+class PaneRight {
     constructor() {
         this.elem = document.createElement('div');
         this.elem.className = 'pane';
@@ -36,6 +36,17 @@ class Pane {
         this.text.style.color = 'white';
         this.elem.appendChild(this.text);
 
+        this.pocket = document.createElement('img');
+        this.pocket.className = 'paneImage';
+        this.pocket.style.width = this.W;
+        this.pocket.style.height = this.W;
+        this.pocket.style.top = document.body.clientHeight - this.W;
+        this.pocket.style.left = 0;
+        this.pocket.style.zIndex = 10;
+        this.pocket.src = 'res/cardPocket.png';
+        this.elem.appendChild(this.pocket);
+
+
         document.body.appendChild(this.elem);
     }
     resize() {
@@ -52,6 +63,11 @@ class Pane {
         }
         this.image.style.width = this.W-20;
         this.image.style.height = this.W-20;
+        
+        this.pocket.style.width = this.W;
+        this.pocket.style.height = this.W;
+        this.pocket.style.top = document.body.clientHeight - this.W;
+
         if(hand.selected) hand.selected.setPos(this.getCardPos());
     }
     makeButton(name, onclick) {
@@ -82,4 +98,4 @@ class Pane {
     }
 };
 
-export var pane = new Pane();
+export var paneRight = new PaneRight();

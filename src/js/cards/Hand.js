@@ -2,7 +2,8 @@ import { CardSet } from './CardSet.js';
 import { cardPositions } from './CardPositions.js';
 import { Card } from './Card.js';
 import { mouseover, mouseout, mousedown } from './CardEventHandlers.js';
-import { pane } from '../core/Pane.js';
+import { paneRight } from '../core/PaneRight.js';
+import { paneLeft } from '../core/PaneLeft.js';
 import { withinRange } from '../turn/WithinRange.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { renderer } from '../core/Renderer.js';
@@ -41,10 +42,17 @@ class Hand extends CardSet{
      */
     push(card, i=null) {
         super.push(card, i);
-        card.elem.style.display = 'block';
-        card.elem.addEventListener('mouseover', mouseover);
-        card.elem.addEventListener('mouseout', mouseout);
-        card.elem.addEventListener('mousedown', mousedown);
+        if(card.getTurnover() <= 1) {
+            card.elem.addEventListener('mouseover', mouseover);
+            card.elem.addEventListener('mouseout', mouseout);
+            card.elem.addEventListener('mousedown', mousedown);
+        }
+        else {
+            card.back.addEventListener('mouseover', mouseover);
+            card.back.addEventListener('mouseout', mouseout);
+            card.back.addEventListener('mousedown', mousedown);
+        }
+        delete renderer.movingCards[card.id];
         this.position();
     }
     /**
@@ -66,7 +74,7 @@ class Hand extends CardSet{
     select(card) {
         this.deselect();
         this.selected = card;
-        card.moveTo(pane.getCardPos(), 50);
+        card.moveTo(paneRight.getCardPos(), 50);
         this.remove(card);
         card.activate();
     }
@@ -77,7 +85,7 @@ class Hand extends CardSet{
     }
 
     reorderingFrom(x, y) {
-        return y > document.body.clientHeight-Card.H*Card.scaleB && x < document.body.clientWidth - pane.W;
+        return y > document.body.clientHeight-Card.H*Card.scaleB && x < document.body.clientWidth - paneRight.W;
     }
 };
 

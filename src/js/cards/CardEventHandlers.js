@@ -1,7 +1,7 @@
 import { hand } from './Hand.js';
 import { Card } from './Card.js';
 import { mouse } from '../core/Mouse.js';
-import { pane } from '../core/Pane.js';
+import { paneRight } from '../core/PaneRight.js';
 import { renderer } from '../core/Renderer.js';
 
 export function move(e) {

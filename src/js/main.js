@@ -9,7 +9,7 @@ import { Creature } from './creatures/Creature.js';
 import { resolver } from './effects/Resolver.js';
 import { evaluate } from './effects/Evaluator.js';
 import { turn } from './turn/Turn.js';
-import { pane } from './core/Pane.js';
+import { paneRight } from './core/PaneRight.js';
 
 
 
@@ -24,15 +24,22 @@ creatureSet[2].x = 1;
 creatureSet[2].y = 5;
 
 
-for(var i=0; i<4; i++) {
+/*for(var i=0; i<10; i++) {
     mew.drawPile.push(new Card('strike'));
     mew.drawPile.push(new Card('defend'));
     mew.drawPile.push(new Card('test'));
-}
+}*/
+mew.drawPile.push(new Card('test'));
 mew.drawPile.shuffle();
 
 turnOrder.push(mew);
 turnOrder.start();
+
+
+/*var card = new Card('test');
+card.back.style.display = 'block';
+card.back.style.zIndex = 10;
+card.setPos({x: 500, y:500, scale:0.7, deg:0});
 
 
 /*var card = new Card('test');

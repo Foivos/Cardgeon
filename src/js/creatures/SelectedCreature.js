@@ -1,5 +1,5 @@
 import { availableMoves } from '../turn/AvailableMoves.js';
-import { pane } from '../core/Pane.js';
+import { paneRight } from '../core/PaneRight.js';
 import { creatureSet } from './CreatureSet.js';
 
 class SelectedCreature {
@@ -11,7 +11,7 @@ class SelectedCreature {
     set(creature , id) {
         this.creature = creature;
         this.id = creatureSet.find(elem => elem === creature);
-        pane.setSelected(creature);
+        paneRight.setSelected(creature);
     }
 }
 

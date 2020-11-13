@@ -2,7 +2,7 @@ import { hand } from '../cards/Hand.js';
 import { creatureSet } from '../creatures/CreatureSet.js';
 import { grid } from './Grid.js'
 import { keys } from './Keys.js'
-import { pane } from './Pane.js';
+import { paneRight } from './PaneRight.js';
 import { selectedCreature } from '../creatures/SelectedCreature.js'
 import { availableMoves } from '../turn/AvailableMoves.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
@@ -20,7 +20,7 @@ class Renderer {
 
     resize() {
         Card.setScales();
-        pane.resize();
+        paneRight.resize();
         grid.resize();
         hand.position();
     }

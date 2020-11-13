@@ -24,8 +24,15 @@ export class Card {
         this.target = {};
         this.speed = 0;
         
-        
+        this.back = document.createElement("img");
+        this.back.style.position = 'absolute';
+        this.back.id = 'cardback' + this.id;
+        this.back.style.display = 'none';
+        this.back.src = 'res/cardback.png';
+
         document.body.appendChild(this.elem);
+        
+        document.body.appendChild(this.back);
         getInfo('cards/' + name, this.init.bind(this));
     }
 
@@ -63,11 +70,11 @@ export class Card {
         this.setX(pos.x);
         this.setY(pos.y);
         this.setDeg(pos.deg);
-        this.setTurnover(pos.turnover);
-        this.target = {};
+        this.setTurnover(pos.turnover);    
     }
     
-    moveTo(pos, speed=10) {
+    moveTo(pos, speed=10, onArrive = null) {
+        this.onArrive = onArrive;
         this.target = pos;
         this.speed = speed;
         renderer.movingCards[this.id] = this;
@@ -88,6 +95,16 @@ export class Card {
     }
     getTurnover() {
         return this.turnover;
+    }
+
+    getPos() {
+        return {
+            x : this.getX(),
+            y : this.getY(),
+            deg : this.getDeg(),
+            scale : this.getScale(),
+            turnover : this.getTurnover(),
+        }
     }
 
     setX(x) {
@@ -115,6 +132,22 @@ export class Card {
 
     setTurnover(turnover) {
         if(!turnover) turnover = 0;
+        if(turnover > 1 && this.turnover <= 1) {
+            var temp = this.elem;
+            this.elem = this.back;
+            this.back = temp;
+            this.elem.style.display = 'block';
+            this.back.style.display = 'none';
+            this.setPos(this.getPos());
+        }
+        else if(turnover <= 1 && this.turnover > 1) {
+            var temp = this.elem;
+            this.elem = this.back;
+            this.back = temp;
+            this.elem.style.display = 'block';
+            this.back.style.display = 'none';
+            this.setPos(this.getPos());
+        }
         this.turnover = turnover;
         this.setTransform();
     }
@@ -141,13 +174,18 @@ export class Card {
         if(dx===0 && dy===0) {
             this.setDeg(this.target.deg);
             this.setScale(this.target.scale);
-            renderer.movingCards[this.id] = null;
+            this.setTurnover(this.target.turnover);
+            delete renderer.movingCards[this.id];
+            if(this.onArrive) this.onArrive();
+            this.onArrive = null;
             return;
         }
         var ratio = Math.sqrt( this.speed**2 / (dx**2 + dy**2) );
         if(ratio >= 1) {
             this.setPos(this.target);
             delete renderer.movingCards[this.id];
+            if(this.onArrive) this.onArrive();
+            this.onArrive = null;
         }
         else {
             this.displace(dx*ratio, dy*ratio, dDeg*ratio, dScale*ratio, dTurnover*ratio);
@@ -179,14 +217,24 @@ export class Card {
         if(hand.selected === this) delete hand.selected;
         turn.hero.discardPile.push(this);
         var pos = {
-            x : document.body.clientWidth + Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
+            x : document.body.clientWidth - Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
             y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
             deg : 0,
             scale : Card.scaleB,
             turnover : 2,
         }
+        var onArrive = function() {
+            var pos = {
+                x : document.body.clientWidth + Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
+                y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
+                deg : 0,
+                scale : Card.scaleB,
+                turnover : 2,
+            }
+            this.moveTo(pos, 25);
+        }
         this.elem.style.zIndex = 0;
-        this.moveTo(pos, 30);
+        this.moveTo(pos, 30, onArrive);
     }
 
     static setScales() {

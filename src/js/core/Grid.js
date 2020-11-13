@@ -1,5 +1,5 @@
 import { onmousedown, scroll } from './GridEventHandlers.js';
-import { pane } from './Pane.js';
+import { paneRight } from './PaneRight.js';
 
 class Grid {
     constructor() {
@@ -16,7 +16,7 @@ class Grid {
         document.body.appendChild(this.canvas);
     }
     resize() {
-        this.canvas.width = document.body.clientWidth - pane.W;
+        this.canvas.width = document.body.clientWidth - paneRight.W;
         this.canvas.height = document.body.clientHeight;
         this.W = this.canvas.width;
         this.H = this.canvas.height;

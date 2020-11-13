@@ -7,6 +7,8 @@ import { DistanceMap } from './core/Containers.js';
 import { getInfo } from './core/Utils.js';
 import { Creature } from './creatures/Creature.js';
 import { resolver } from './effects/Resolver.js';
+import { evaluate } from './effects/Evaluator.js';
+import { turn } from './turn/Turn.js';
 
 
 

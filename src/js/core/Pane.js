@@ -68,7 +68,7 @@ class Pane {
 
     setSelected(creature) {
         this.image.src = creature.sprite.src;
-        this.text.innerHTML = creature.hp;
+        this.text.innerHTML = creature.stats.get('hp') + ' + ' + creature.stats.get('armour');
     }
 
     getCardPos() {

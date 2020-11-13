@@ -3,32 +3,5 @@
     "art" : "test",
     "text" : "Testing Code.",
     "actions" : 0,
-    "results" : {
-        "result" : "test",
-        "arg1" : {
-            "selector" : "getStat",
-            "target" : {
-                "selector" : "single",
-                "range" : 3,
-                "id" : "target"
-            },
-            "stat" : "hp"
-        },
-        "arg2" : {
-            "selector" : "evaluate",
-            "parts" : [
-                {
-                    "selector" : "getStat",
-                    "target" : {"id" : "target"},
-                    "stat" : "armour"
-                },
-                "+",
-                {
-                    "selector" : "getStat",
-                    "target" : {"id" : "target"},
-                    "stat" : "hp"
-                }
-            ]
-        }
-    }
+    "results" : "console.log(getStat($single#target(6), 'hp') + getStat(#target, 'armour'))"
 }

@@ -1,120 +1,116 @@
 import { selectorMaps } from './Selectors.js';
 import { resultMaps } from './Results.js'
 import { asArray } from '../core/Utils.js';
+import { evaluate } from './Evaluator.js';
+import { turn } from '../turn/Turn.js';
+
+const operators = '+-*/%=>!<&|,]';
 
 class Resolver {
     constructor() {
-        this.init();
     }
 
     init(results, whenDone) {
-        this.results = asArray(results);
-        this.selected = [];
+        if(Array.isArray(results)) {
+            results = results.join('\n');
+        }
+        this.results = results.split('$resolve()');
         this.selectors = [];
-        this.selectorIDs = {};
+        this.cache = {};
+        this.parsed = '';
         this.whenDone = whenDone;
-        this.vars = [[]];
         this.i = 0;
         this.j = 0;
     }
 
-    resolve() {
-        this.j = 0;
-        var result = this.results[this.i];
-        var map = resultMaps[result.result];
-        this.applyDynamicFunction(map.result, result, map.vars);
-        this.i++;
-        if(this.i < this.results.length) {
-            this.nextResult();
-        }
-        else {
-            this.whenDone();
-        }
-    }
+    
 
     proccess(results, whenDone) {
         this.init(results, whenDone);
         this.nextResult();
     }
 
-    nextResult() {
-        this.vars = asArray(resultMaps[this.results[this.i].result].vars);
-        var result = this.results[this.i];
-        for(var i=0; i<this.vars.length; i++) {
-            var value = asArray(result[this.vars[i]]);
-            for(var j=0; j<value.length; j++) {
-                if(value[j].selector) {
-                    this.addSelectorsRecursive(value[j]);
+    parseSelectors(s) {
+        if(typeof s !== 'string') return s;
+        for(var i=0; i<s.length; i++) {
+            if(s[i] === '$') {
+                var j = i + 1;
+                while(s[j++] != '(') {}
+                var d = 1;
+                while(d > 0) {
+                    if(s[j] === '(') d++;
+                    if(s[j++] === ')') d--;
                 }
+                var selector = this.parseSelectors(s.substring(i+1,j));
+                var id = this.getId(selector);
+                if(id === null) {
+                    id = '#' + this.i + ':' + this.selectors.length;
+                    s = s.replace('$' + selector, id);
+                    selector = selector.replace('(', id + '(');
+                } 
+                else {
+                    s = s.replace('$' + selector, id);
+                }
+                this.selectors.push(selector);
             }
         }
+        return s;
+    }
+
+    nextResult() {
+        var result = this.results[this.i];
+        this.parsed = this.parseSelectors(result);    
         this.j = 0;
         this.nextSelector();
     }
 
-    addSelectorsRecursive(selector) {
-        var vars = asArray(selectorMaps[selector.selector].vars);
-        for(var i=0; i<vars.length; i++) {
-            var values = asArray(selector[vars[i]])
-            for(var j=0; j<values.length; j++) {
-                if(values[j].selector) {
-                    this.addSelectorsRecursive(values[j]);
-                }
-            }
-        }
-        if(!selector.id) selector.id = '#' + this.i + ':' + this.selectors.length;
-        this.selectors.push(selector);
-    }
-
     nextSelector() {
+        if(this.j >= this.selectors.length) {
+            this.resolve();
+            return;
+        }
         var selector = this.selectors[this.j];
-        var map = selectorMaps[selector.selector];
-        this.applyDynamicFunction(map.selector, selector, map.vars);
+        var f = selectorMaps[this.getName(selector)].selector;
+
+        var i = selector.indexOf('(');
+        var fname = selector.substring(0,i).trim();
+        selector = selector.replace(fname, 'this.f');
+        evaluate.bind({s : selector, cache : this.cache, f : f})(turn.hero);
     }
     
+    getName(selector) {
+        var i = selector.indexOf('#');
+        return selector.substring(0,i).trim();
+    }
+
 
     send(selected) {
-        if(this.selectors[this.j].id) {
-            this.selectorIDs[this.selectors[this.j].id] = selected; 
-        }
+        var id = this.getId(this.selectors[this.j]);
+        this.cache[id] = selected;
+        this.parsed = this.parsed.replaceAll(id, 'this.cache["' + id + '"]');
         this.j++;
-        if(this.j < this.selectors.length) {
-            this.nextSelector();
+        this.nextSelector();
+    }
+    cancel() {
+    }
+
+    resolve() {
+        this.j = 0;
+        evaluate.bind({s : this.parsed, cache : this.cache})(turn.hero);
+        this.i++;
+        if(this.i < this.results.length) {
+            this.nextResult();
         }
         else {
-            this.resolve();
+            if(this.whenDone) this.whenDone();
         }
     }
 
-    cancel() {
-
-    }
-
-
-    /**
-     * Applys function f with arguments being the args followed by each value of data specified by keys.
-     * @param {function} f The function to apply.
-     * @param {Object} data An object that includes keys specified by vars. 
-     * @param {* | Array} vars The keys of the data to pass to the functions.
-     * @param  {...any} args Additional arguments.
-     */
-    applyDynamicFunction(f, data, keys, ...args) {
-        keys = asArray(keys);
-        var r = [];
-        for(var i=0; i<keys.length; i++) {
-            var value = data[keys[i]];
-            if(value.id) {
-                value = this.selectorIDs[value.id];
-            } else if(Array.isArray(value)) {
-                for(var j=0; j<value.length; j++) {
-                    if(value[j].id) {
-                        value[j] = this.selectorIDs[value[j].id]
-                    }
-                }
-            }
-            r.push(value);
-        }
-        f(...args, ...r);
+    getId(selector) {
+        var start = selector.indexOf('(');
+        var hash = selector.indexOf('#');
+        if(hash === -1 || hash > start) return null;
+        return (selector.substring(selector.indexOf('#'), selector.indexOf('(')));
     }
 }
 

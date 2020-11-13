@@ -3,11 +3,5 @@
     "art" : "defend",
     "text" : "Gain 5 Armour.",
     "actions" : 1,
-    "results" : {
-        "result" : "armour",
-        "armour" : 5,
-        "target" : {
-            "selector" : "self"
-        }
-    }
+    "results" : "modifyStat(self, 'armour', 5)"
 }

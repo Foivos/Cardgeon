@@ -25,6 +25,7 @@ export class Creature {
         }
         this.stats.set('hp', hp);
         this.stats.set('armour', armour);
+        if(hp<=0) this.die();
     }
 
     applyArmour(n) {

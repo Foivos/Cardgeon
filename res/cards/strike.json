@@ -3,12 +3,5 @@
     "art" : "strike",
     "text" : "Deal 5 Damage.",
     "actions" : 1,
-    "results" : {
-        "result" : "damage",
-        "damage" : 5,
-        "target" : {
-            "selector" : "single",
-            "range" : 1
-        }
-    }
+    "results" : "damage($single(1), 5)"
 }

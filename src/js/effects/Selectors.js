@@ -39,10 +39,10 @@ function self() {
     resolver.send(turn.hero);
 }
 
-function evaluate(parts) {console.log(''.concat(...parts));
+function evaluate(parts) {
     resolver.send(eval(''.concat(...parts)));
 }
 
-function getStat(target, stat) {console.log(target, stat);
+function getStat(target, stat) {
     resolver.send(target.stats.get(stat));
 }

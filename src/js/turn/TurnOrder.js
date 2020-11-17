@@ -11,11 +11,11 @@ class TurnOrder extends Array{
 
     advance() {
         this.i = (this.i+1) % this.length;
-        turn.end();
-        turn.start(this[this.i]);
+        turn.end(function() {
+            turn.start(turnOrder[turnOrder.i]);
+        });
         availableMoves.delete()
         withinRange.delete();
-        paneRight.image.src = turn.hero.sprite.src;
     }
 
     start() {

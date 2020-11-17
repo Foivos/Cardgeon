@@ -16,6 +16,7 @@ class Renderer {
         setInterval(this.tick.bind(this), 1000.0/60.0)
         this.movingCards = {};
         window.onresize = this.resize;
+        this.doneWithMoves = [];
     }
 
     resize() {
@@ -82,9 +83,20 @@ class Renderer {
     }
 
     advanceCards() {
+        var flag = true;
         for (var i in this.movingCards) {
-            if (this.movingCards[i] == null) continue;
-            this.movingCards[i].advanceMove();
+            if(this.movingCards[i] == null) continue;
+            if(this.movingCards[i].movements.length === 0) {
+                this.movingCards[i] = null;
+                continue;
+            }
+            flag = false
+            var card = this.movingCards[i];
+            card.setPos(card.movements[0].getPos(i));
+        }
+        if(flag) {
+            var f = this.doneWithMoves.splice(0,1);
+            if(f[0]) f[0]();
         }
     }
 

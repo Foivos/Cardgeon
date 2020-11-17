@@ -17,7 +17,7 @@ class Hand extends CardSet{
         this.highlight.style.position = 'absolute';
         this.highlight.style.top = 0;
         this.highlight.style.left = 0;
-        this.highlight.style.zIndex = 20;
+        this.highlight.style.zIndex = 30;
         this.highlight.style.display = 'none';
         document.body.appendChild(this.highlight);
     }
@@ -31,8 +31,9 @@ class Hand extends CardSet{
             var card = this[i];
             if (this.moving && card === this.moving) continue;
             var pos = Pos[i];
-            card.moveTo(pos, 20);
-            card.elem.style.zIndex = (hand.hovered === card) ? 11 : hand.length-1-i;
+            card.movements = [];
+            card.moveTo(pos, 3);
+            card.elem.style.zIndex = (hand.hovered === card) ? 20 : hand.length+9-i;
         }
     }
     /**
@@ -67,14 +68,15 @@ class Hand extends CardSet{
 
     pop() {
         var card = super.pop();
-        card.hide();
+        //card.hide();
         return card;
     }
 
     select(card) {
         this.deselect();
         this.selected = card;
-        card.moveTo(paneRight.getCardPos(), 50);
+        var pos = paneRight.getCardPos();
+        card.moveTo(pos, 2);
         this.remove(card);
         card.activate();
     }
@@ -86,6 +88,24 @@ class Hand extends CardSet{
 
     reorderingFrom(x, y) {
         return y > document.body.clientHeight-Card.H*Card.scaleB && x < document.body.clientWidth - paneRight.W;
+    }
+
+    discardAll(onDiscard) {
+        hand.deselect();
+
+        if(hand.length <= 0) {
+            onDiscard();
+            return;
+        }
+        var int = setInterval(function() {
+            if(hand.length <= 1) {console.log('here');
+                clearInterval(int);
+            }
+            if(hand.length <= 0) return;
+            var card = hand.pop();
+            card.discard();
+        }, 10);
+        setTimeout(() => {renderer.doneWithMoves.push(onDiscard);}, 20);
     }
 };
 

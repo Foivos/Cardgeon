@@ -1,4 +1,5 @@
 import { hand } from '../cards/Hand.js';
+import { renderer } from '../core/Renderer.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { availableMoves } from './AvailableMoves.js';
 import { withinRange } from './WithinRange.js';
@@ -8,6 +9,7 @@ export class Turn {
         this.hero = null;
         this.remainingMove = 0;
         this.actions = 0;
+        this.toDraw = 0;
     }
 
     move(path, onFinish) {
@@ -17,7 +19,7 @@ export class Turn {
         withinRange.delete();
     }
 
-    start(hero) {
+    start(hero, onStart) {
         this.hero = hero;
         this.actions = hero.actions;
         this.remainingMove = 0;
@@ -26,24 +28,48 @@ export class Turn {
         }
     }
 
-    end() {
-        hand.deselect();
-        while(hand.length > 0) {
-            hand[0].discard();
-        }
+    end(onEnd) {
+        hand.discardAll(onEnd);
     }
 
     drawCard() {
+        if(this.toDraw > 0) {
+            this.toDraw++;
+            return;
+        }
         if(this.hero.drawPile.length === 0 && this.hero.discardPile.length === 0) return;
-        if(hand.length + hand.selected ? 1 : 0 >= 10) return;
+        if(hand.length + (hand.selected ? 1 : 0) >= 10) return;
         if(this.hero.drawPile.length === 0) {
-            while(this.hero.discardPile.length > 0) {
-                this.hero.drawPile.push(this.hero.discardPile.pop());
-            }
-            this.hero.drawPile.shuffle();
+            renderer.doneWithMoves.push(function() {
+                turn.hero.drawPile.shuffle();
+                var n = turn.toDraw;
+                turn.toDraw = 0;
+                turn.draw(n);
+            });
+            var int = setInterval(function() {
+                if(turn.hero.discardPile.length <=1) clearInterval(int);
+                if(turn.hero.discardPile.length <=0) return;
+                var card = turn.hero.discardPile.pop();
+                turn.hero.drawPile.push(card);
+                card.reshuffle();
+            }, 10);
+            this.toDraw = 1;
+            return;
         }
         var card = this.hero.drawPile.draw();
         hand.push(card);
+    }
+
+    draw(n) {
+        var obj = {n:n};
+        var int = setInterval(function(obj) {
+            var n = obj.n--;
+            if(n <= 1) {
+                clearInterval(int);
+                if(n <= 0) return;
+            }
+            turn.drawCard();
+        }.bind(null, obj), 10);
     }
 }
 

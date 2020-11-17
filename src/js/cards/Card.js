@@ -2,6 +2,8 @@ import { renderer } from '../core/Renderer.js';
 import { getInfo, getLines } from '../core/Utils.js';
 import { resolver } from '../effects/Resolver.js';
 import { turn } from '../turn/Turn.js';
+import { CardCoord } from './CardCoord.js';
+import { CardMovement } from './CardMovement.js';
 import { hand } from './Hand.js';
 
 
@@ -21,14 +23,13 @@ export class Card {
         this.elem.width = Card.W;
         this.elem.height = Card.H;
         this.setPos({x:0, y:document.body.clientHeight, deg:0, scale:0});
-        this.target = {};
-        this.speed = 0;
         
         this.back = document.createElement("img");
         this.back.style.position = 'absolute';
         this.back.id = 'cardback' + this.id;
         this.back.style.display = 'none';
         this.back.src = 'res/cardback.png';
+        this.movements = [];
 
         document.body.appendChild(this.elem);
         
@@ -73,10 +74,26 @@ export class Card {
         this.setTurnover(pos.turnover);    
     }
     
-    moveTo(pos, speed=10, onArrive = null) {
-        this.onArrive = onArrive;
-        this.target = pos;
-        this.speed = speed;
+    moveTo(pos, speed, onArrive = null) {
+        var d2 = 0;
+        /*for(var key in CardCoord.default) {
+            var n1 = this[key];
+            if(!n1 && n1 !== 0) {
+                n1 = CardCoord.default[key];
+            }
+            var n2 = pos[key];
+            if(!n2 && n2 !== 0) {
+                n2 = CardCoord.default[key];
+            }
+            d2 += (n1 - n2) ** 2;
+        }*/
+        d2 = (this.x - pos.x) ** 2 + (this.y - pos.y) ** 2;
+        if(d2 === 0) {
+            if (onArrive) onArrive();
+            return;
+        };
+        pos.t = Math.sqrt(d2) / speed;
+        this.movements.push(new CardMovement(this, [pos], null, onArrive));
         renderer.movingCards[this.id] = this;
     }
 
@@ -136,6 +153,7 @@ export class Card {
             var temp = this.elem;
             this.elem = this.back;
             this.back = temp;
+            this.elem.style.zIndex = this.back.style.zIndex;
             this.elem.style.display = 'block';
             this.back.style.display = 'none';
             this.setPos(this.getPos());
@@ -144,6 +162,7 @@ export class Card {
             var temp = this.elem;
             this.elem = this.back;
             this.back = temp;
+            this.elem.style.zIndex = this.back.style.zIndex;
             this.elem.style.display = 'block';
             this.back.style.display = 'none';
             this.setPos(this.getPos());
@@ -210,12 +229,14 @@ export class Card {
         delete renderer.movingCards[this.id];
     }
 
-    discard() {
+    discard(onDiscard) {
         hand.remove(this);
         if(hand.moving === this) delete hand.moving;
         if(hand.hovered === this) delete hand.hovered;
         if(hand.selected === this) delete hand.selected;
+        this.movements = [];
         turn.hero.discardPile.push(this);
+        
         var pos = {
             x : document.body.clientWidth - Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
             y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
@@ -223,24 +244,83 @@ export class Card {
             scale : Card.scaleB,
             turnover : 2,
         }
-        var onArrive = function() {
-            var pos = {
-                x : document.body.clientWidth + Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
-                y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
-                deg : 0,
-                scale : Card.scaleB,
-                turnover : 2,
-            }
-            this.moveTo(pos, 25);
+        
+        var t = Math.sqrt((this.x - pos.x) ** 2 + (this.y - pos.y) ** 2) / 2;
+        pos.t = t;
+        var deriv = {
+            x : 2,
+            y : 0,
+            turnover : 0,
+            t : t,
         }
+        this.movements.push(new CardMovement(this, [pos], [deriv]));
+
+        pos = {
+            x : document.body.clientWidth + Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
+            y : document.body.clientHeight - Card.W * Card.scaleB / 2,
+            deg : 0,
+            scale : Card.scaleB,
+            turnover : 2,
+        }
+
+        this.moveTo(pos, 2, onDiscard);
         this.elem.style.zIndex = 0;
-        this.moveTo(pos, 30, onArrive);
+        
+        renderer.movingCards[this.id] = this;
+    }
+
+    reshuffle(onShuffle) {
+        var pos = {
+            x : document.body.clientWidth - Card.H * Card.scaleB / 2 - Card.W * Card.scaleB,
+            y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
+            deg : 0,
+            scale : Card.scaleB,
+            turnover : 2,
+        }
+        this.moveTo(pos, 2);
+        pos = {
+            x : document.body.clientWidth/2,
+            y : document.body.clientHeight/2,
+            deg : 0,
+            scale : Card.scaleB,
+            turnover : 2,
+        }
+        var t = Math.sqrt((this.x - pos.x) ** 2 + (this.y - pos.y) ** 2) / 2;
+        pos.t = t;
+        var coords = [pos];
+        var pos1 = {
+            x : Card.H * Card.scaleB / 2 + Card.W * Card.scaleB,
+            y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
+            deg : 0,
+            scale : Card.scaleB,
+            turnover : 2,
+        }
+        t += Math.sqrt((pos1.x - pos.x) ** 2 + (pos1.y - pos.y) ** 2) / 2;
+        pos1.t = t;
+        coords.push(pos1);
+        pos = {
+            x : -2,
+            y : 0,
+            turnover : 0,
+            t : t,
+        }
+        this.movements.push(new CardMovement(this, coords, [pos]));
+        pos = {
+            x : -Card.H * Card.scaleB / 2 + Card.W * Card.scaleB,
+            y : document.body.clientHeight - Card.W * Card.scaleB / 2 ,
+            deg : 0,
+            scale : Card.scaleB,
+            turnover : 2,
+        }
+
+        this.moveTo(pos, 2, onShuffle);
     }
 
     static setScales() {
         var w = document.body.clientWidth;
         this.scaleB = w/this.W/7.7;
         this.scaleS = this.scaleB*0.7;
+        CardCoord.default.scale = this.scaleB;
     }
 
     setHighlight(h) {

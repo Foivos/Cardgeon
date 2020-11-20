@@ -1,39 +1,22 @@
-import { hand } from '../cards/Hand.js';
-import { creatureSet } from '../creatures/CreatureSet.js';
-import { grid } from './Grid.js'
-import { keys } from './Keys.js'
+import { grid } from '../ui/Grid.js'
+import { keys } from '../../core/Keys.js'
 import { paneRight } from './PaneRight.js';
-import { selectedCreature } from '../creatures/SelectedCreature.js'
-import { availableMoves } from '../turn/AvailableMoves.js';
-import { movingCreatures } from '../creatures/MovingCreatures.js';
-import { turn } from '../turn/Turn.js';
-import { withinRange } from '../turn/WithinRange.js';
-import { CardSet } from '../cards/CardSet.js';
-import { Card } from '../cards/Card.js';
+import { paneLeft } from '../ui/PaneLeft.js';
 
 class Renderer {
     constructor() {
-        setInterval(this.tick.bind(this), 1000.0/60.0)
-        this.movingCards = {};
+        setInterval(this.tick.bind(this), 1000.0/60.0);
         window.onresize = this.resize;
-        this.doneWithMoves = [];
     }
 
     resize() {
-        Card.setScales();
-        paneRight.resize();
         grid.resize();
-        hand.position();
     }
 
     tick() {
-        this.advanceCards();
         this.advanceGrid();
-        this.advanceCreatures();
 
         this.clearGrid();
-        this.drawHighlighs();
-        this.drawCreatures();
         this.drawGrid();
     }
 
@@ -102,21 +85,6 @@ class Renderer {
 
     drawHighlighs(numbers = false) {
         grid.ctx.globalAlpha = 0.2;
-        for (var i=0; i<availableMoves.length; i++) {
-            if(!availableMoves[i]) continue;
-            var x = availableMoves.getX(i);
-            var y = availableMoves.getY(i);
-            grid.ctx.fillStyle = 'rgb(100, 100, 255)';
-            grid.ctx.fillRect((x-grid.x) * grid.d, (y-grid.y) * grid.d, grid.d, grid.d);
-            if(numbers) {
-                grid.ctx.globalAlpha = 1;
-                grid.ctx.font = "20px Arial";
-                grid.ctx.strokeStyle = 'black';
-                grid.ctx.fillText(availableMoves[i][0], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
-                grid.ctx.globalAlpha = 0.2;
-            }
-        }
-
         for (var i=0; i<withinRange.length; i++) {
             if(!withinRange[i]) continue;
             var x = withinRange.getX(i);
@@ -128,6 +96,25 @@ class Renderer {
                 grid.ctx.font = "20px Arial";
                 grid.ctx.fillText(withinRange[i][0], (x-grid.x+0.5) * grid.d, (y-grid.y+1) * grid.d);
                 if(withinRange.nvars > 1) grid.ctx.fillText(withinRange[i][1], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
+                grid.ctx.globalAlpha = 0.2;
+            }
+        }
+
+        if(withinRange.length) {
+            grid.ctx.globalAlpha = 1.0;
+            return;
+        }
+        for (var i=0; i<availableMoves.length; i++) {
+            if(!availableMoves[i]) continue;
+            var x = availableMoves.getX(i);
+            var y = availableMoves.getY(i);
+            grid.ctx.fillStyle = 'rgb(100, 100, 255)';
+            grid.ctx.fillRect((x-grid.x) * grid.d, (y-grid.y) * grid.d, grid.d, grid.d);
+            if(numbers) {
+                grid.ctx.globalAlpha = 1;
+                grid.ctx.font = "20px Arial";
+                grid.ctx.strokeStyle = 'black';
+                grid.ctx.fillText(availableMoves[i][0], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
                 grid.ctx.globalAlpha = 0.2;
             }
         }

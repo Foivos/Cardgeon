@@ -2,11 +2,11 @@ import { CardSet } from './CardSet.js';
 import { cardPositions } from './CardPositions.js';
 import { Card } from './Card.js';
 import { mouseover, mouseout, mousedown } from './CardEventHandlers.js';
-import { paneRight } from '../core/PaneRight.js';
-import { paneLeft } from '../core/PaneLeft.js';
+import { paneRight } from '../ui/PaneRight.js';
+import { paneLeft } from '../ui/PaneLeft.js';
 import { withinRange } from '../turn/WithinRange.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
-import { renderer } from '../core/Renderer.js';
+import { renderer } from '../ui/Renderer.js';
 
 class Hand extends CardSet{
     constructor() {
@@ -82,6 +82,7 @@ class Hand extends CardSet{
     }
 
     deselect(i=0) {
+        withinRange.length = 0;
         if(this.selected) this.push(this.selected, i);
         delete this.selected;
     }
@@ -98,7 +99,7 @@ class Hand extends CardSet{
             return;
         }
         var int = setInterval(function() {
-            if(hand.length <= 1) {console.log('here');
+            if(hand.length <= 1) {
                 clearInterval(int);
             }
             if(hand.length <= 0) return;

@@ -33,7 +33,7 @@ http.createServer(function (req, res) {
 	}
 	reqpath = reqpath.replace(/\/$/, '/index.html');
 	console.log("Received request for " + reqpath);
-	type = path.extname(reqpath).slice(1);
+	/*type = path.extname(reqpath).slice(1);
 	if(!folders[type]) {
 		return;
 	}
@@ -58,7 +58,25 @@ http.createServer(function (req, res) {
 			res.statusCode = 404;
 			res.end('Not found');
 		});
+	}*/
+
+	var file = path.join(__dirname, reqpath);
+	if (file.indexOf(__dirname + path.sep) !== 0) {
+		res.statusCode = 403;
+		res.setHeader('Content-Type', 'text/plain');
+		return res.end('Forbidden');
 	}
+	var type = mime[type] || 'text/plain';
+	var s = fs.createReadStream(file);
+	s.on('open', function () {
+		res.setHeader('Content-Type', type);
+		s.pipe(res);
+	});
+	s.on('error', function () {
+		res.setHeader('Content-Type', 'text/plain');
+		res.statusCode = 404;
+		res.end('Not found');
+	});
 
 }).listen(3001);
 

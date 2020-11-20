@@ -11,6 +11,7 @@ import { movingCreatures } from '../creatures/MovingCreatures.js';
 
 export function move() {
     if(turn.actions <= 0) return;
+    hand.deselect();
     turn.actions--;
     turn.remainingMove += turn.hero.stats.get('speed');
     if(movingCreatures.length > 0) return;

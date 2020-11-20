@@ -7,7 +7,7 @@ class Resolver {
     constructor() {
     }
 
-    init(results, whenDone) {
+    init(results, actions, whenDone) {
         if(Array.isArray(results)) {
             results = results.join('\n');
         }
@@ -16,14 +16,15 @@ class Resolver {
         this.cache = {};
         this.parsed = '';
         this.whenDone = whenDone;
+        this.actions = actions;
         this.i = 0;
         this.j = 0;
     }
 
     
 
-    proccess(results, whenDone) {
-        this.init(results, whenDone);
+    proccess(results, actions, whenDone) {
+        this.init(results, actions, whenDone);
         this.nextResult();
     }
 
@@ -89,6 +90,7 @@ class Resolver {
     }
 
     resolve() {
+        if(this.i === 0) turn.actions -= this.actions;
         for(var id in this.cache) { 
             this.parsed = this.parsed.replaceAll(id, 'this.cache["' + id + '"]');
         }

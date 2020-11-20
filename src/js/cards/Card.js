@@ -1,4 +1,4 @@
-import { renderer } from '../core/Renderer.js';
+import { renderer } from '../ui/Renderer.js';
 import { getInfo, getLines } from '../core/Utils.js';
 import { resolver } from '../effects/Resolver.js';
 import { turn } from '../turn/Turn.js';
@@ -39,6 +39,7 @@ export class Card {
 
     init(data) {
         this.results = data.results;
+        this.actions = data.actions;
         var frame = new Image();
         frame.onload = function(){
             var ctx = this.elem.getContext('2d');
@@ -184,43 +185,12 @@ export class Card {
         this.elem.style.transform = s;
     }
 
-    advanceMove() {
-        var dx = this.target.x - this.x;
-        var dy = this.target.y - this.y;
-        var dDeg = this.target.deg - this.deg;
-        var dScale = this.target.scale - this.scale;
-        var dTurnover = this.target.turnover - this.turnover;
-        if(dx===0 && dy===0) {
-            this.setDeg(this.target.deg);
-            this.setScale(this.target.scale);
-            this.setTurnover(this.target.turnover);
-            delete renderer.movingCards[this.id];
-            if(this.onArrive) this.onArrive();
-            this.onArrive = null;
+    activate() {
+        if(turn.actions < this.actions) {
+            hand.deselect();
             return;
         }
-        var ratio = Math.sqrt( this.speed**2 / (dx**2 + dy**2) );
-        if(ratio >= 1) {
-            this.setPos(this.target);
-            delete renderer.movingCards[this.id];
-            if(this.onArrive) this.onArrive();
-            this.onArrive = null;
-        }
-        else {
-            this.displace(dx*ratio, dy*ratio, dDeg*ratio, dScale*ratio, dTurnover*ratio);
-        }
-    }
-
-    displace (dx, dy, dDeg=0, dScale=0, dTurnover = 0) {
-        this.setX(this.getX() + dx);
-        this.setY(this.getY() + dy);
-        this.setDeg(this.getDeg() + dDeg);
-        this.setScale(this.getScale() + dScale)
-        this.setTurnover(this.getTurnover() + dTurnover);
-    }
-
-    activate() {
-        resolver.proccess(this.results, this.discard.bind(this));
+        resolver.proccess(this.results, this.actions, this.discard.bind(this));
     }
 
     hide() {
@@ -280,7 +250,7 @@ export class Card {
         this.moveTo(pos, 2);
         pos = {
             x : document.body.clientWidth/2,
-            y : document.body.clientHeight/2,
+            y : document.body.clientHeight/3*2,
             deg : 0,
             scale : Card.scaleB,
             turnover : 2,

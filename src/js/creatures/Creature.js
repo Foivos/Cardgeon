@@ -1,15 +1,19 @@
-import { grid } from '../core/Grid.js';
+import { grid } from '../ui/Grid.js';
 import { Stats } from '../effects/Stats.js';
 import { Tags } from '../effects/Tags.js';
 
 export class Creature {
+    
+    static nextId = 0;
     constructor(image) {
+        this.id = Creature.nextId++;
         this.x = 1;
         this.y = 1;
-        this.sprite = new Image();
-        this.sprite.src = 'res/' + image + '.png';
         this.stats = new Stats();
         this.tags = new Tags();
+        if(!image) return;
+        this.sprite = new Image();
+        this.sprite.src = 'res/' + image + '.png';
     }
 
     damage(n, source) {

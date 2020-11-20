@@ -65,6 +65,7 @@ export class DistanceMap extends Array{
     }
     /**
      * Creates a DistanceMap around a set of squares an arbitrary number of variables.
+     * @param {number} d The additional distance to traverse to.
      * @param {number} dmax The maximum distance to traverse to.
      * @param {Array.number} x0 The center x's of the distance map.
      * @param {Array.number} y0 The center y's of the distance map.
@@ -83,7 +84,7 @@ export class DistanceMap extends Array{
         this.I0 = [];
     }/**
      * Creates a DistanceMap around a single square with a single variable.
-     * @param {number} dmax The maximum distance to traverse to.
+     * @param {number} d The maximum distance to traverse to.
      * @param {number} x0 The center x of the distance map.
      * @param {number} y0 The center y of the distance map.
      * @param {function} findAdjecent An array of functions that take an x and a y and return objects holding x, y and d, the additional distance.

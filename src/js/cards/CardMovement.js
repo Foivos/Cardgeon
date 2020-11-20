@@ -1,4 +1,4 @@
-import { renderer } from '../core/Renderer.js';
+import { renderer } from '../ui/Renderer.js';
 import { getTime, matrixInvert, matrixMultiply } from '../core/Utils.js';
 import { Card } from './Card.js';
 import { CardCoord } from './CardCoord.js';

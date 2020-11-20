@@ -1,5 +1,4 @@
 import { availableMoves } from './AvailableMoves.js';
-import { paneRight } from '../core/PaneRight.js';
 import { turn } from './Turn.js';
 import { withinRange } from './WithinRange.js';
 

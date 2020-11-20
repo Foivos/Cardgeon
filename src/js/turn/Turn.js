@@ -1,5 +1,6 @@
 import { hand } from '../cards/Hand.js';
-import { renderer } from '../core/Renderer.js';
+import { paneLeft } from '../ui/PaneLeft.js';
+import { renderer } from '../ui/Renderer.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { availableMoves } from './AvailableMoves.js';
 import { withinRange } from './WithinRange.js';
@@ -22,6 +23,7 @@ export class Turn {
     start(hero, onStart) {
         this.hero = hero;
         this.actions = hero.actions;
+        paneLeft.setActions(this.actions);
         this.remainingMove = 0;
         for(var i=0; i<7; i++) {
             this.drawCard();

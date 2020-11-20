@@ -1,11 +1,5 @@
-import { creatureSet } from '../creatures/CreatureSet.js'
-import { selectedCreature } from '../creatures/SelectedCreature.js';
-import { availableMoves } from '../turn/AvailableMoves.js';
-import { getTime } from './Utils.js';
-import { turn } from '../turn/Turn.js';
-import { mouse } from './Mouse.js';
-import { hand } from '../cards/Hand.js';
-import { withinRange } from '../turn/WithinRange.js';
+import { getTime } from '../../core/Utils.js';
+import { mouse } from '../../core/Mouse.js';
 import { grid } from './Grid.js';
 
 
@@ -33,9 +27,22 @@ export function onmousemove(e) {
         return;
     }
     if (!e) e = window.event;
-    grid.x -= (e.clientX - grid.mouse.x) / grid.d;
-    grid.y -= (e.clientY - grid.mouse.y) / grid.d;
-    grid.mouse = {x:e.clientX, y:e.clientY};
+    var selected = document.getElementsByClassName('paneButtonSelected')[0];
+    if(!selected) {
+        grid.x -= (e.clientX - grid.mouse.x) / grid.d;
+        grid.y -= (e.clientY - grid.mouse.y) / grid.d;
+        grid.mouse = {x:e.clientX, y:e.clientY};
+        return;
+    }
+    name = selected.id.split(':')[1];
+    switch(name) {
+        case 'wall':
+            break;
+        case 'solid':
+            break;
+        case 'clear':
+            break;
+    }
 }
 
 export function onmouseup(e) {
@@ -54,7 +61,7 @@ export function onmouseup(e) {
         withinRange.onSelect(x, y);
     }
     
-    if(availableMoves.length === 0 ||  (x === turn.hero.x &&  y === turn.hero.y)) return;
+    if(withinRange.length > 0 || availableMoves.length === 0 ||  (x === turn.hero.x &&  y === turn.hero.y)) return;
     if(availableMoves.get(x, y)) {
         var path = availableMoves.getPathTo(x, y);
         turn.move(path);

@@ -1,5 +1,4 @@
-import { availableMoves } from '../turn/AvailableMoves.js';
-import { paneRight } from '../core/PaneRight.js';
+import { paneRight } from '../ui/PaneRight.js';
 import { creatureSet } from './CreatureSet.js';
 
 class SelectedCreature {

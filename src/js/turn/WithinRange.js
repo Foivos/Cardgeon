@@ -9,7 +9,7 @@ class WithinRange extends DistanceMap{
         super()
     }
 
-    calculate(d) {
+    calculate(d, origin = turn.hero) {
         this.delete();
         var f = function(x,y) {
             var adj = [
@@ -24,7 +24,7 @@ class WithinRange extends DistanceMap{
             ];
             return adj.map(elem => ({x:x+elem.x, y:y+elem.y, d:elem.d}));
         }
-        super.initSingle(d, turn.hero.x, turn.hero.y, f);
+        super.initSingle(d, origin.x, origin.y, f);
         //super.initNested(availableMoves, d, f);
     }
 

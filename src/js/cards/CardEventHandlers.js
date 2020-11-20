@@ -1,8 +1,6 @@
 import { hand } from './Hand.js';
 import { Card } from './Card.js';
-import { mouse } from '../core/Mouse.js';
-import { paneRight } from '../core/PaneRight.js';
-import { renderer } from '../core/Renderer.js';
+import { renderer } from '../ui/Renderer.js';
 
 export function move(e) {
     e = e || window.event;

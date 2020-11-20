@@ -1,0 +1,69 @@
+
+
+body {
+    margin : 0px;
+    overflow: hidden;
+}
+
+.paneImage {
+    position : absolute;
+}
+
+.paneActionDisplay {
+    position : absolute;
+    z-index : 11;
+}
+
+.paneActionCount {
+    position : absolute;
+    z-index : 12;
+    text-align: center;
+}
+
+.paneButton {
+    display: inline-block;
+    background-color : rgb(50, 50, 60);
+    border : none;
+    color : white;
+    border-radius : 4px;
+    width : 44%;
+    height : 5%;
+    margin : 3%
+}
+
+.paneButtonSelected {
+    display: inline-block;
+    background-color : rgb(100, 100, 120);
+    border : none;
+    color : white;
+    border-radius : 4px;
+    width : 44%;
+    height : 5%;
+    margin : 3%
+}
+
+.paneLeft {
+    position : absolute;
+    top : 0;
+    left : 0;
+    width : 13%;
+    height : 100%;
+    background-color : rgb(30, 30, 40);
+}
+
+.paneRight {
+    position : absolute;
+    top : 0;
+    left : 87%;
+    width : 13%;
+    height : 100%;
+    background-color : rgb(30, 30, 40);
+}
+
+.grid {
+    position: absolute;
+    margin : 0;
+    background-color : rgb(158, 154, 161);
+    top : 0%;
+    left : 13%
+}

@@ -159,3 +159,22 @@ export function matrixMultiply(M1, M2) {
     }
     return R;
 }
+
+export function intersects(l1, l2) {
+    if(Math.abs((l1.x1 - l1.x0) * (l2.y1 - l2.y0) - (l2.x1 - l2.x0) * (l1.y1 - l1.y0)) < 1e-12) {
+        if(Math.abs((l1.x0 * l1.y1 - l1.x1 * l1.y0 - l2.x0 * l2.y1 + l2.x1 * l2.y0)) < 1e-12) {
+            return true;
+        }
+        return false;
+    }
+    if((distance(l1, l2.x0, l2.y0) * distance(l1, l2.x1, l2.y1) <= 0) && (distance(l2, l1.x0, l1.y0) * distance(l2, l1.x1, l1.y1) <= 0)) return true;
+    return false;
+}
+
+export function distance(l, x, y) {
+    return ((l.y1 - l.y0) * x - (l.x1 - l.x0) * y + l.x1 * l.y0 - l.x0 * l.y1) / length(l);
+}
+
+export function length(l) {
+    return Math.sqrt((l.x1 - l.x0) ** 2 + (l.y1 - l.y0) ** 2);
+}

@@ -1,3 +1,4 @@
+import { level } from '../../map/Level.js';
 import { toggle } from './PaneEventHandlers.js'
 
 class PaneRight {
@@ -7,7 +8,7 @@ class PaneRight {
         
         this.makeButton('wall', toggle);
         this.makeButton('solid', toggle);
-        this.makeButton('clear', toggle);
+        this.makeButton('save', level.save.bind(level));
         document.body.appendChild(this.elem);
     }
     resize() {

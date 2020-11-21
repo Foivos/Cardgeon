@@ -2,6 +2,8 @@ import { grid } from '../ui/Grid.js'
 import { keys } from '../../core/Keys.js'
 import { paneRight } from './PaneRight.js';
 import { paneLeft } from '../ui/PaneLeft.js';
+import { level } from '../../map/Level.js';
+import { mouse } from '../../core/Mouse.js';
 
 class Renderer {
     constructor() {
@@ -18,6 +20,9 @@ class Renderer {
 
         this.clearGrid();
         this.drawGrid();
+        this.drawGridSelection();
+        this.drawWalls()
+        this.drawTerrain();
     }
 
     advanceGrid() {
@@ -25,6 +30,11 @@ class Renderer {
         if(keys.pressed.down && !keys.pressed.up) grid.y+=10/grid.d;
         if(keys.pressed.left && !keys.pressed.right) grid.x-=10/grid.d;
         if(keys.pressed.right && !keys.pressed.left) grid.x+=10/grid.d;
+        
+        if(grid.x < -3) grid.x = -3;
+        if(grid.y < -3) grid.y = -3;
+        if(grid.x + grid.canvas.width / grid.d > level.W +3) grid.x = level.W + 3 - grid.canvas.width / grid.d;
+        if(grid.y + grid.canvas.height / grid.d > level.H +3) grid.y = level.H + 3 - grid.canvas.height / grid.d;
     }
 
     clearGrid() {
@@ -36,16 +46,76 @@ class Renderer {
         grid.ctx.beginPath();
         grid.ctx.lineWidth = 0.3;
         grid.ctx.strokeStyle = 'black';
-        for(var f = Math.ceil(grid.x)*grid.d-grid.x*grid.d; f<grid.canvas.width; f+=grid.d) {
-            grid.ctx.moveTo(f,0);
-            grid.ctx.lineTo(f,grid.canvas.height);
+        for(var f = Math.ceil(Math.max(0, grid.x))*grid.d-grid.x*grid.d; f<=0.1+Math.min(grid.canvas.width, (level.W - grid.x) * grid.d); f+=grid.d) {
+            grid.ctx.moveTo(f, Math.max(0, -grid.y * grid.d));
+            grid.ctx.lineTo(f, Math.min(grid.canvas.height, (level.H - grid.y) * grid.d));
         }
-        for(var f = Math.ceil(grid.y)*grid.d-grid.y*grid.d; f<grid.canvas.height; f+=grid.d) {
-            grid.ctx.moveTo(0, f);
-            grid.ctx.lineTo(grid.canvas.width, f);
+        for(var f = Math.ceil(Math.max(0, grid.y))*grid.d-grid.y*grid.d; f<=0.1+Math.min(grid.canvas.height, (level.H - grid.y) * grid.d); f+=grid.d) {
+            grid.ctx.moveTo(Math.max(0, -grid.x * grid.d), f);
+            grid.ctx.lineTo(Math.min(grid.canvas.width, (level.W - grid.x) * grid.d), f);
         }
         grid.ctx.stroke();
         grid.ctx.closePath();
+    }
+
+    drawGridSelection() {
+        if(!grid.selecting) return;
+        var selected = document.getElementsByClassName('paneButtonSelected')[0];
+        if(!selected) return;
+        name = selected.id.split(':')[1];
+        if(mouse.button === 0 && name === 'wall') {
+            grid.ctx.beginPath();
+            grid.ctx.lineWidth = grid.d/30;
+            grid.ctx.strokeStyle = 'black';
+            grid.ctx.moveTo(grid.selecting.x0 * grid.d - grid.x * grid.d, grid.selecting.y0 * grid.d - grid.y * grid.d);
+            grid.ctx.lineTo(grid.selecting.x1 * grid.d - grid.x * grid.d, grid.selecting.y1 * grid.d - grid.y * grid.d);
+        
+            grid.ctx.stroke();
+            grid.ctx.closePath();
+            return;
+        }
+        switch(mouse.button) {
+        case 0:
+            grid.ctx.fillStyle = level.fillstyle[level.codes['solid']];
+            break;
+        case 2:
+            grid.ctx.fillStyle = level.fillstyle[level.codes['clear']];
+            break;
+        default:
+            return;
+        }
+        var x0 = Math.min(grid.selecting.x0, grid.selecting.x1);
+        var y0 = Math.min(grid.selecting.y0, grid.selecting.y1);
+        var w = Math.abs(grid.selecting.x0 - grid.selecting.x1) * grid.d;
+        var h = Math.abs(grid.selecting.y0 - grid.selecting.y1) * grid.d;
+        grid.ctx.fillRect((x0 - grid.x) * grid.d, (y0 - grid.y) * grid.d, w, h);        
+    }
+
+    drawWalls() {
+        grid.ctx.beginPath();
+        grid.ctx.lineWidth = grid.d/30;
+        grid.ctx.strokeStyle = 'black';
+        for(var i=0; i<level.walls.length; i++) {
+            var wall = level.walls[i];
+            grid.ctx.moveTo(wall.x0 * grid.d - grid.x * grid.d, wall.y0 * grid.d - grid.y * grid.d);
+            grid.ctx.lineTo(wall.x1 * grid.d - grid.x * grid.d, wall.y1 * grid.d - grid.y * grid.d);
+        }
+        grid.ctx.stroke();
+        grid.ctx.closePath();
+    }
+
+    drawTerrain() {
+        for(var i=0; i< level.squares.length; i++) {
+            if(!level.fillstyle[level.squares[i]]) continue;
+            var x0 = i % level.W;
+            var y0 = Math.floor(i / level.W); 
+            var x = (x0 - grid.x) * grid.d;
+            var y = (y0 - grid.y) * grid.d;
+            if(x > grid.canvas.width || x + grid.d < 0 || y > grid.canvas.height || y + grid.d < 0) continue;
+            grid.ctx.fillStyle = level.fillstyle[level.squares[i]]
+            grid.ctx.fillRect(x, y, grid.d, grid.d);
+        }
+        
     }
 
     drawCreatures() {

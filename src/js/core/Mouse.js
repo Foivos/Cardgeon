@@ -7,6 +7,7 @@ class Mouse {
         this.lastY = null;
         document.onmousedown = onmousedown;
         document.onmouseup = onmouseup;
+        document.onmousemove = onmousemove;
     }
 
     wasClick() {
@@ -26,5 +27,10 @@ function onmousedown(e) {
 }
 
 function onmouseup(e) {
+}
+
+function onmousemove(e) {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
 }
 

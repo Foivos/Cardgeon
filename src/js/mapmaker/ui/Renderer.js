@@ -1,7 +1,5 @@
 import { grid } from '../ui/Grid.js'
 import { keys } from '../../core/Keys.js'
-import { paneRight } from './PaneRight.js';
-import { paneLeft } from '../ui/PaneLeft.js';
 import { level } from '../../map/Level.js';
 import { mouse } from '../../core/Mouse.js';
 
@@ -23,18 +21,20 @@ class Renderer {
         this.drawGridSelection();
         this.drawWalls()
         this.drawTerrain();
+        this.drawCreatures();
     }
 
     advanceGrid() {
+        if (document.activeElement.nodeName === 'INPUT') return;
         if(keys.pressed.up && !keys.pressed.down) grid.y-=10/grid.d;
         if(keys.pressed.down && !keys.pressed.up) grid.y+=10/grid.d;
         if(keys.pressed.left && !keys.pressed.right) grid.x-=10/grid.d;
         if(keys.pressed.right && !keys.pressed.left) grid.x+=10/grid.d;
         
-        if(grid.x < -3) grid.x = -3;
-        if(grid.y < -3) grid.y = -3;
-        if(grid.x + grid.canvas.width / grid.d > level.W +3) grid.x = level.W + 3 - grid.canvas.width / grid.d;
-        if(grid.y + grid.canvas.height / grid.d > level.H +3) grid.y = level.H + 3 - grid.canvas.height / grid.d;
+        if(grid.x < -3 && grid.x + grid.canvas.width / grid.d < level.W + 3) grid.x = Math.min(-3, level.W + 3 - grid.canvas.width / grid.d);
+        if(grid.y < -3 && grid.y + grid.canvas.height / grid.d < level.H + 3) grid.y = Math.min(-3, level.H + 3 - grid.canvas.height / grid.d)
+        if(grid.x + grid.canvas.width / grid.d > level.W + 3 && grid.x > -3) grid.x = Math.max(-3, level.W + 3 - grid.canvas.width / grid.d)
+        if(grid.y + grid.canvas.height / grid.d > level.H + 3 && grid.y > -3) grid.y = Math.max(-3, level.H + 3 - grid.canvas.height / grid.d)
     }
 
     clearGrid() {
@@ -119,19 +119,25 @@ class Renderer {
     }
 
     drawCreatures() {
-        for(var i in creatureSet) {
-            var creature = creatureSet[i]
+        for(var i in level.creatures) {
+            var creature = level.creatures[i];
             var x = (creature.x - grid.x) * grid.d;
             var y = (creature.y - grid.y) * grid.d;
             if(x>grid.W || x+grid.d<0 || y>grid.H || y+grid.d<0) continue;
             grid.ctx.drawImage(creature.sprite, x, y, grid.d, grid.d);
-            if(selectedCreature.creature == creature) {
+            if(grid.selectedCreature == creature) {
                 grid.ctx.beginPath();
                 grid.ctx.lineWidth = grid.d/30;
                 grid.ctx.strokeStyle = 'rgb(0, 100, 0)';
                 grid.ctx.rect((creature.x-grid.x) * grid.d, (creature.y-grid.y) * grid.d, grid.d, grid.d);
                 grid.ctx.stroke();
             }
+        }
+        if(grid.placingCreature) {
+            var creature = grid.placingCreature;
+            var x = (creature.x - grid.x) * grid.d;
+            var y = (creature.y - grid.y) * grid.d;
+            grid.ctx.drawImage(creature.sprite, x, y, grid.d, grid.d);
         }
     }
 

@@ -1,19 +1,27 @@
-import { grid } from '../ui/Grid.js';
 import { Stats } from '../effects/Stats.js';
 import { Tags } from '../effects/Tags.js';
 
 export class Creature {
     
     static nextId = 0;
-    constructor(image) {
+    constructor(data) {
+        this.art = data.art;
         this.id = Creature.nextId++;
-        this.x = 1;
-        this.y = 1;
+        this.name = data.name;
         this.stats = new Stats();
         this.tags = new Tags();
-        if(!image) return;
         this.sprite = new Image();
-        this.sprite.src = 'res/' + image + '.png';
+        this.x = data.x;
+        this.y = data.y;
+        for(var stat in data.stats) {
+            this.stats.set(stat, data.stats[stat]);
+        }
+        this.moves = {};
+        for(var move in data.moves) {
+            this.moves[move] = data.moves[move];
+        }
+        if(!this.art) return;
+        this.sprite.src = 'res/' + this.art + '.png';
     }
 
     damage(n, source) {

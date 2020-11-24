@@ -1,0 +1,13 @@
+{
+    "name" : "Orc",
+    "id" : "orc",
+    "stats" : {
+        "hp" : 50,
+        "speed" : 5,    
+        "actions" : 2
+    },
+    "moves" : {
+        "attack" : "damage($single(1), 7)"
+    },
+    "art" : "salamance"
+}

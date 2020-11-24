@@ -1,11 +1,13 @@
 {
-    "name" : "goblin",
+    "name" : "Goblin",
+    "id" : "goblin",
     "stats" : {
         "hp" : 25,
-        "speed" : 6
+        "speed" : 6,    
+        "actions" : 2
     },
-    "actions" : 2,
     "moves" : {
         "attack" : "damage($single(1), 5)"
-    }
+    },
+    "art" : "goblin"
 }

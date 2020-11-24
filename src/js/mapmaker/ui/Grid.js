@@ -1,4 +1,4 @@
-import { onmousedown, scroll, oncontextmenu } from './GridEventHandlers.js';
+import { onmousedown, scroll, oncontextmenu, mousemoveGeneral, clickGeneral } from './GridEventHandlers.js';
 import { paneRight } from './PaneRight.js';
 
 class Grid {
@@ -17,6 +17,8 @@ class Grid {
         this.canvas.onwheel = scroll;
         this.canvas.onmousedown = onmousedown;
         this.canvas.oncontextmenu = oncontextmenu;
+        this.canvas.addEventListener('mousemove', mousemoveGeneral, false);
+        this.canvas.addEventListener('mouseup', clickGeneral, false);
         document.body.appendChild(this.canvas);
     }
     resize() {

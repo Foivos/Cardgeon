@@ -1,3 +1,6 @@
+import { getInfo, intersects } from '../core/Utils.js';
+import { Creature } from '../creatures/Creature.js';
+import { CreatureSet } from '../creatures/CreatureSet.js';
 
 
 class Level {
@@ -7,12 +10,13 @@ class Level {
         this.walls = [];
         this.squares = [];
         this.squares.length = this.W * this.H;
-
+        this.creatures = new CreatureSet();
         
         this.codes = {
             empty : 0,
             solid : 1,
-            clear : 2,
+            clear : 3,
+            spawn : 2,
         }
 
         for(var i=0; i<this.W * this.H; i++) {
@@ -22,15 +26,26 @@ class Level {
         this.fillstyle = {}
         this.fillstyle[this.codes['solid']] = "rgba(0, 0, 0, 0.5)";
         this.fillstyle[this.codes['clear']] = "rgba(255, 255, 255, 0.5)";
+        this.fillstyle[this.codes['spawn']] = "rgba(100, 100, 255, 0.5)";
     }
 
     load(name) {
-        
+        getInfo('levels/' + name, function(data) {
+            Object.assign(this, data);
+            var creatures = this.creatures;
+            this.creatures = new CreatureSet();
+            for(var i=0; i<creatures.length; i++) {
+                this.creatures.push(new Creature(creatures[i]));
+            }
+        }.bind(this));
     }
-    save(name) {    
+    save(name) {
         var a = document.createElement('a');
-        a.download = 'this.json';
-        a.href = "data:text/json;base64," + btoa(JSON.stringify(this));
+        a.download = name + '.json';
+        a.href = "data:text/json;base64," + btoa(JSON.stringify(this, function(key, value) {
+            if(key === 'sprite') return undefined;
+            return value;
+        }));
         a.click();
     }
 
@@ -71,11 +86,11 @@ class Level {
         }
         for(var i=0; i<this.walls.length; i++) {
             var wall = this.walls[i];
-            if(wall.x0 >= x0 && wall.x0 <= y1 && wall.y0 >= y0 && wall.y0 <= y1) {
+            if(wall.x0 >= x0 && wall.x0 <= x1 && wall.y0 >= y0 && wall.y0 <= y1) {
                 this.walls.splice(i--, 1);
                 continue;
             }
-            if(wall.x1 >= x0 && wall.x1 <= y1 && wall.y1 >= y0 && wall.y1 <= y1) {
+            if(wall.x1 >= x0 && wall.x1 <= x1 && wall.y1 >= y0 && wall.y1 <= y1) {
                 this.walls.splice(i--, 1);
                 continue;
             }
@@ -133,6 +148,24 @@ class Level {
             }
         }
     }
+    
+    setDimentions(W, H) {
+        var squares = [];
+        squares.length = H * W;
+        for(var i=0; i<W && i<this.W; i++) {
+            for(var j=0; j<H && i<this.H; j++) {
+                squares[i + j * W] = this.squares[i + j * this.W];
+            }
+        }
+        this.squares = squares;
+        for(var i=0; i<this.walls.length; i++) {
+            if(this.walls[i].x1 > W + 1 || this.walls[i].y1 > H + 1) {
+                this.walls.splice(i--, 1);
+            }
+        }
+        this.W = W;
+        this.H = H;
+    }
 }
 
-export var level = new Level(10, 10);
+export var level = new Level(30, 30);

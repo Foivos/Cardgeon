@@ -2,6 +2,7 @@ import { getTime } from '../../core/Utils.js';
 import { mouse } from '../../core/Mouse.js';
 import { grid } from './Grid.js';
 import { level } from '../../map/Level.js';
+import { paneLeft } from './PaneLeft.js';
 
 
 export function scroll(e) {
@@ -19,8 +20,8 @@ export function scroll(e) {
 export function onmousedown(e) {
     if (!e) e = window.event;
     grid.mouse = {x:e.layerX, y:e.layerY};
-    grid.canvas.onmousemove = onmousemove;
-    grid.canvas.onmouseup = onmouseup;
+    grid.canvas.addEventListener('mousemove', onmousemove, false);
+    grid.canvas.addEventListener('mouseup', onmouseup, false);
     var selected = document.getElementsByClassName('paneButtonSelected')[0];
     if(selected) {
         var f = e.shiftKey ? ((x) => x) : ((x) => Math.floor(x+0.5));
@@ -28,6 +29,21 @@ export function onmousedown(e) {
             x0 : Math.max(0, Math.min(level.W, f(grid.mouse.x / grid.d + grid.x))),        
             y0 : Math.max(0, Math.min(level.H, f(grid.mouse.y / grid.d + grid.y))),
         }
+    }
+    if(grid.placingCreature || selected) return;
+    var x = Math.max(0, Math.min(level.W, Math.floor(e.layerX / grid.d + grid.x)));
+    var y = Math.max(0, Math.min(level.H, Math.floor(e.layerY / grid.d + grid.y)));
+    var creature = level.creatures.occupying(x,y);
+    if(!creature) {
+        grid.selectedCreature = null;
+        return;
+    }
+    if(e.button === 0) {
+        grid.selectedCreature = creature;
+        paneLeft.load(creature);
+    }
+    else if(e.button === 2) {
+        level.creatures.remove(creature);
     }
 }
 
@@ -42,6 +58,11 @@ export function onmousemove(e) {
     if (!e) e = window.event;
     var selected = document.getElementsByClassName('paneButtonSelected')[0];
     if(!selected) {
+        if(grid.selectedCreature) {
+            grid.selectedCreature.x = Math.max(0, Math.min(level.W, Math.floor(e.layerX / grid.d + grid.x)));
+            grid.selectedCreature.y = Math.max(0, Math.min(level.H, Math.floor(e.layerY / grid.d + grid.y)));
+            return;
+        }
         grid.x -= (e.layerX - grid.mouse.x) / grid.d;
         grid.y -= (e.layerY - grid.mouse.y) / grid.d;
         if(grid.x < -3) grid.x = -3;
@@ -58,12 +79,13 @@ export function onmousemove(e) {
 }
 
 export function onmouseup(e) {
+    grid.canvas.removeEventListener('mousemove', onmousemove, false);
+    grid.canvas.removeEventListener('mouseup', onmouseup, false);
     grid.canvas.onmousemove = null;
     grid.canvas.onmouseup = null;
     
     var selected = document.getElementsByClassName('paneButtonSelected')[0];
-    if(!selected) return;
-    name = selected.id.split(':')[1];
+    name = selected ? selected.id.split(':')[1] : null;
     switch(mouse.button) {
     case 0:
         switch(name) {
@@ -74,6 +96,8 @@ export function onmouseup(e) {
                 level.addSolid(grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
                 break;
             case 'clear':
+                break;
+            default:
                 break;
         }
         break;
@@ -96,4 +120,28 @@ export function onmouseup(e) {
 export function oncontextmenu(e) {
     e.preventDefault();
     return false;
+}
+
+export function mousemoveGeneral(e) {
+    if(grid.placingCreature) {
+        var x = Math.max(0, Math.min(level.W, Math.floor(e.layerX / grid.d + grid.x)));
+        var y = Math.max(0, Math.min(level.H, Math.floor(e.layerY / grid.d + grid.y)));
+        grid.placingCreature.x = x;
+        grid.placingCreature.y = y;
+    }
+}
+
+
+export function clickGeneral(e) {
+    if(e.button === 2) {
+        grid.placingCreature = null;
+    }
+    if(grid.placingCreature) {
+        var x = Math.max(0, Math.min(level.W, Math.floor(e.layerX / grid.d + grid.x)));
+        var y = Math.max(0, Math.min(level.H, Math.floor(e.layerY / grid.d + grid.y)));
+        if(level.creatures.occupying(x,y)) return;
+        grid.placingCreature.x = x;
+        grid.placingCreature.y = y;
+        level.creatures.push(Object.assign({}, grid.placingCreature));
+    }
 }

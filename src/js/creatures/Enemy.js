@@ -7,28 +7,14 @@ export class Enemy extends Creature {
     }
 
     init(data) {
+        this.name = data.name;
+        for(var stat in data.stats) {
+            this.stats.set(stat, data.stats[stat]);
+        }
+        this.actions = 2;
+        this.moves = stats.moves;
         this.results = data.results;
-        this.actions = data.actions;
-        var frame = new Image();
-        frame.onload = function(){
-            var ctx = this.elem.getContext('2d');
-            ctx.drawImage(frame, 0, 0);
-            ctx.font = '32px monospace';
-            ctx.fillText(data.name, 52, 37);
-            ctx.font = '50px monospace';
-            ctx.fillText(data.actions, 12, 41);
-            ctx.font = '20px monospace';
-            var lines = getLines(ctx, data.text, 262);
-            for(var i=0; i<lines.length; i++) {
-                ctx.fillText(lines[i], 20, 270+20*i, 262);
-            }
-            var art = new Image();
-            art.onload = function(){
-                ctx.drawImage(art, 16, 50);
-            }.bind(this);
-            art.src = 'res/art/' + data.art + '.png';
-        }.bind(this);
-        frame.src = 'res/frame.png';
+        this.sprite.src = data.art;
     }
         
     takeTurn() {

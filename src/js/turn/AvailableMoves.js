@@ -7,7 +7,9 @@ class AvailableMoves extends DistanceMap {
         super()
     }
 
-    calculate() {
+    calculate(creature, moves) {
+        if(!creature) creature = turn.hero;
+        if(!moves && moves !== 0) moves = turn.remainingMove;
         this.delete();
         var f = function(x,y) {
             var adj = [
@@ -34,7 +36,7 @@ class AvailableMoves extends DistanceMap {
             return r;
         }
        
-        super.initSingle(turn.remainingMove, turn.hero.x, turn.hero.y, f);
+        super.initSingle(moves, creature.x, creature.y, f);
     }
 }
 

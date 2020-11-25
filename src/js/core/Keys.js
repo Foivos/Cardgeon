@@ -6,12 +6,15 @@ class Keys {
             down : 'down',
             left : 'left',
             right : 'right',
+            shift : 'shift',
         };
         this.keybinds = {
             KeyW : this.commands.up,
             KeyS : this.commands.down,
             KeyA : this.commands.left,
             KeyD : this.commands.right,
+            ShiftLeft : this.commands.shift,
+            ShiftRight : this.commands.shift,
         };
         document.addEventListener('keydown', this.keydown.bind(this));
         document.addEventListener('keyup', this.keyup.bind(this));

@@ -1,8 +1,5 @@
 import { turn } from './Turn.js';
-import { availableMoves } from './AvailableMoves.js';
-import { hand } from '../cards/Hand.js';
 import { DistanceMap } from '../core/Containers.js';
-import { creatureSet } from '../creatures/CreatureSet.js';
 
 class WithinRange extends DistanceMap{
     constructor() {

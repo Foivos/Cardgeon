@@ -1,6 +1,6 @@
 import { turn } from './Turn.js';
 import { DistanceMap} from '../core/Containers.js';
-import { creatureSet } from '../creatures/CreatureSet.js';
+import { level } from '../map/Level.js';
 
 class AvailableMoves extends DistanceMap {
     constructor() {
@@ -25,10 +25,10 @@ class AvailableMoves extends DistanceMap {
             var r = [];
             for(var i=0; i<adj.length; i++) {
                 var pos = {x : x + adj[i].x, y : y + adj[i].y, d : adj[i].d};
-                if(creatureSet.occupying(pos.x, pos.y)) {
+                if(level.creatures.occupying(pos.x, pos.y)) {
                     continue;
                 }
-                if(pos.d === 1.5 && (creatureSet.occupying(pos.x, y) || creatureSet.occupying(x, pos.y))) {
+                if(pos.d === 1.5 && (level.creatures.occupying(pos.x, y) || level.creatures.occupying(x, pos.y))) {
                     continue;
                 }
                 r.push(pos);

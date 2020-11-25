@@ -92,12 +92,9 @@ export function onmouseup(e) {
             case 'wall':
                 level.addWall(grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
                 break;
-            case 'solid':
-                level.addSolid(grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
-                break;
-            case 'clear':
-                break;
-            default:
+            default: 
+                var elem = document.getElementById('paneRightTerrain');
+                level.addTerrain(elem.textContent, grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
                 break;
         }
         break;
@@ -106,10 +103,9 @@ export function onmouseup(e) {
             case 'wall':
                 level.removeWalls(grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
                 break;
-            case 'solid':
-                level.removeSolid(grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
-                break;
-            case 'clear':
+            default:
+                var elem = document.getElementById('paneRightTerrain');
+                level.removeTerrain(elem.textContent, grid.selecting.x0, grid.selecting.y0, grid.selecting.x1, grid.selecting.y1);
                 break;
         }
         break;

@@ -13,9 +13,9 @@ class Level {
         this.creatures = new CreatureSet();
         
         this.codes = {
+            clear : -1,
             empty : 0,
             solid : 1,
-            clear : 3,
             spawn : 2,
         }
 
@@ -27,9 +27,10 @@ class Level {
         this.fillstyle[this.codes['solid']] = "rgba(0, 0, 0, 0.5)";
         this.fillstyle[this.codes['clear']] = "rgba(255, 255, 255, 0.5)";
         this.fillstyle[this.codes['spawn']] = "rgba(100, 100, 255, 0.5)";
+        this.fillstyle[this.codes['solid'] | this.codes['spawn']] = "rgba(0, 0, 150, 0.5)";
     }
 
-    load(name) {
+    load(name, onload) {
         getInfo('levels/' + name, function(data) {
             Object.assign(this, data);
             var creatures = this.creatures;
@@ -37,6 +38,7 @@ class Level {
             for(var i=0; i<creatures.length; i++) {
                 this.creatures.push(new Creature(creatures[i]));
             }
+            if(onload) onload();
         }.bind(this));
     }
     save(name) {
@@ -107,7 +109,7 @@ class Level {
         }
     }
 
-    addSolid(x0, y0, x1, y1) {
+    addTerrain(name, x0, y0, x1, y1) {
         if(x0 == x1 && y0 == y1) {
             return;
         }
@@ -123,12 +125,12 @@ class Level {
         }
         for(var i=x0; i<x1; i++) {
             for(var j=y0; j<y1; j++) {
-                this.squares[i + j * level.W] = this.codes.solid;
+                this.squares[i + j * level.W] |= this.codes[name];
             }
         }
     }
 
-    removeSolid(x0, y0, x1, y1) {
+    removeTerrain(name, x0, y0, x1, y1) {
         if(x0 == x1 && y0 == y1) {
             return;
         }
@@ -144,7 +146,7 @@ class Level {
         }
         for(var i=Math.ceil(x0); i<=x1-1; i++) {
             for(var j=Math.ceil(y0); j<=y1-1; j++) {
-                this.squares[i + j * level.W] = this.codes.empty;
+                this.squares[i + j * level.W] &= ~this.codes[name];
             }
         }
     }

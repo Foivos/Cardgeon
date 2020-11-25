@@ -1,6 +1,5 @@
-import { asArray } from '../core/Utils.js';
-import { creatureSet } from '../creatures/CreatureSet.js';
-import { turn } from '../turn/Turn.js'
+
+import { level } from '../map/Level.js';
 import { withinRange } from '../turn/WithinRange.js';
 import { resolver } from './Resolver.js';
 
@@ -13,7 +12,7 @@ export const selectorMaps = {
 function single(range) {
     withinRange.calculate(range);
     withinRange.onSelect = function(x ,y) {
-        var creature = creatureSet.occupying(x, y);
+        var creature = level.creatures.occupying(x, y);
         if(!creature) return;
         withinRange.delete();
         resolver.send(creature);

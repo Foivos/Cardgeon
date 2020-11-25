@@ -24,24 +24,11 @@ body {
     text-align: center;
 }
 
-.paneRightButton {
-    display: inline-block;
-    background-color : rgb(50, 50, 60);
-    border : none;
-    color : white;
-    border-radius : 4px;
-    width : 48%;
-    height : 3%;
-    margin : 1%
-}
-
 .paneButton:hover{
     background-color: rgb(70, 70, 80);
 }
 
-.paneButtonSelected {
-    background-color : rgb(100, 100, 120);
-}
+
 
 .paneLeft {
     position : absolute;
@@ -104,14 +91,37 @@ body {
     z-index: 1;
 }
 
+
 .dropdown-content a {
     color : white;
-    padding: 12px 16px;
+    padding: 3px 3px;
     text-decoration: none;
     display: block;
 }
 
 .dropdown-content a:hover {background-color: rgb(70, 70, 80);}
+
+.dropdown-content-right {
+    display: none;
+    position: absolute;
+    left : 50%;
+    background-color:  rgb(50, 50, 60);
+    min-width: 48%;
+    margin: 0 1% 0 1%;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-radius : 4px;
+    z-index: 1;
+}
+
+.dropdown-content-right a {
+    color : white;
+    padding: 3px 3px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content-right  a:hover {background-color: rgb(70, 70, 80);}
 
 .show {display: block;}
 
@@ -226,4 +236,19 @@ body {
     color : white;
     width : 34%;
     height : 3%
+}
+
+.paneRightButton {
+    display: inline-block;
+    background-color : rgb(50, 50, 60);
+    border : none;
+    color : white;
+    border-radius : 4px;
+    width : 48%;
+    height : 3%;
+    margin : 1%
+}
+
+.paneButtonSelected {
+    background-color : rgb(100, 100, 120);
 }

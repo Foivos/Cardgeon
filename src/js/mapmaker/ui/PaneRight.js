@@ -39,7 +39,48 @@ class PaneRight {
         });
 
         this.makeButton('wall', toggle);
-        this.makeButton('solid', toggle);
+
+        var load = document.createElement('button');
+        load.className = 'dropbtn';
+        load.classList.add('paneRightButton');
+        load.id = 'paneRightTerrain';
+        load.textContent = 'solid';
+        var div = document.createElement('div');
+        div.className = 'dropdown-content-right';
+        div.id = 'paneRightList';
+
+        for(var code in level.codes) {
+            if(code === 'empty' || code === 'clear') continue;
+            var a = document.createElement('a');
+            a.textContent = code;
+            a.onclick = function(e) {
+                var load = document.getElementById('paneRightTerrain');
+                load.textContent = e.target.textContent;
+                load.classList.add('paneButtonSelected');
+            }
+            div.appendChild(a);
+        }
+        load.onclick = function(e) {
+            div.classList.toggle('show');
+            toggle(e);
+        }      
+
+        this.elem.appendChild(load);
+        this.elem.appendChild(div);
+
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content-right");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }, false);
+
         var levelName = document.createElement('input');
         levelName.id = 'levelName';
         levelName.className = 'paneRightInput';

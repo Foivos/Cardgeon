@@ -1,4 +1,3 @@
-import { creatureSet } from '../creatures/CreatureSet.js'
 import { selectedCreature } from '../creatures/SelectedCreature.js';
 import { availableMoves } from '../turn/AvailableMoves.js';
 import { getTime } from '../core/Utils.js';
@@ -7,6 +6,7 @@ import { mouse } from '../core/Mouse.js';
 import { hand } from '../cards/Hand.js';
 import { withinRange } from '../turn/WithinRange.js';
 import { grid } from './Grid.js';
+import { level } from '../map/Level.js';
 
 
 export function scroll(e) {
@@ -43,10 +43,10 @@ export function onmouseup(e) {
     document.onmouseup = null;
     var d = Math.sqrt((mouse.lastX - e.clientX) ** 2 + (mouse.lastY - e.clientY) ** 2);
     if (d > 5) return; 
-    var x = Math.floor(e.clientX / grid.d + grid.x);
-    var y = Math.floor(e.clientY / grid.d + grid.y);
+    var x = Math.floor(e.layerX / grid.d + grid.x);
+    var y = Math.floor(e.layerY / grid.d + grid.y);
 
-    var creature = creatureSet.occupying(x, y);
+    var creature = level.creatures.occupying(x, y);
     if(creature) {
         selectedCreature.set(creature);
     }

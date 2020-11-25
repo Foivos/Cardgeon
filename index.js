@@ -33,8 +33,8 @@ http.createServer(function (req, res) {
 	}
 	reqpath = reqpath.replace(/\/$/, '/index.html');
 	console.log("Received request for " + reqpath);
-	/*type = path.extname(reqpath).slice(1);
-	if(!folders[type]) {
+	type = path.extname(reqpath).slice(1);
+	/*if(!folders[type]) {
 		return;
 	}
 	var Folders = folders[type];

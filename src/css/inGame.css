@@ -5,37 +5,73 @@ body {
     overflow: hidden;
 }
 
+.pane {
+    position: absolute;
+    height : 100%;
+    width : 13%;
+    top : 0%;
+    background-color : rgb(30, 30, 40);
+}
+
 .paneImage {
-    position : absolute;
+    position : inline-block;
+    top : 0%;
+    left : 0%;
+    width : 100%;
 }
 
 .paneActionDisplay {
     position : absolute;
     z-index : 11;
+    width : 60%;
+    margin : 20%;
+    bottom : 0%;
+    left : 0%;
+}
+
+.paneLeft {
+    left : 0%;
+}
+.paneRight {
+    right : 0%;
+}
+
+.paneText {
+    position : inline-block;
+    width : 98%;
+    height : 3%;
+    color : white;
+    margin : 1%;
 }
 
 .paneActionCount {
     position : absolute;
     z-index : 12;
     text-align: center;
+    width : 40%;
+    margin : 30%;
+    bottom : 0%;
+    left : 0%;
+    font-size : 5vw;
+    text-align: center;
 }
 
 .paneButton {
-    position : absolute;
+    position : inline-block;
     background-color : rgb(50, 50, 60);
     border : none;
     color : white;
     border-radius : 4px;
-}
-
-.pane {
-    position : absolute;
-    background-color : rgb(30, 30, 40);
+    width : 98%;
+    height : 3%;
+    margin : 1%;
+    
 }
 
 .grid {
     margin : 0;
     background-color : rgb(158, 154, 161);
+    height : 100%;
 }
 
 
@@ -43,4 +79,15 @@ body {
     position : absolute;
     z-index : 10;
     transform : rotate(180deg);
+    bottom : 0%;
+    width : 100%;
+    left : 0%;
+}
+
+.rightPocket {
+    position : absolute;
+    z-index : 10;
+    bottom : 0%;
+    width : 100%;
+    left : 0%;
 }

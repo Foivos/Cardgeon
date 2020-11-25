@@ -1,5 +1,5 @@
+import { level } from '../map/Level.js';
 import { paneRight } from '../ui/PaneRight.js';
-import { creatureSet } from './CreatureSet.js';
 
 class SelectedCreature {
     constructor() {
@@ -9,7 +9,7 @@ class SelectedCreature {
 
     set(creature , id) {
         this.creature = creature;
-        this.id = creatureSet.find(elem => elem === creature);
+        this.id = level.creatures.find(elem => elem === creature);
         paneRight.setSelected(creature);
     }
 }

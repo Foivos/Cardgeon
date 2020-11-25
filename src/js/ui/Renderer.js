@@ -1,5 +1,4 @@
 import { hand } from '../cards/Hand.js';
-import { creatureSet } from '../creatures/CreatureSet.js';
 import { grid } from './Grid.js'
 import { keys } from '../core/Keys.js'
 import { paneRight } from './PaneRight.js';
@@ -11,6 +10,7 @@ import { withinRange } from '../turn/WithinRange.js';
 import { CardSet } from '../cards/CardSet.js';
 import { Card } from '../cards/Card.js';
 import { paneLeft } from './PaneLeft.js';
+import { level } from '../map/Level.js';
 
 class Renderer {
     constructor() {
@@ -35,9 +35,38 @@ class Renderer {
 
         this.clearGrid();
         this.drawHighlighs();
+        this.drawWalls()
+        this.drawTerrain();
         this.drawCreatures();
         this.drawGrid();
         paneLeft.setActions(turn.actions);
+    }
+
+    drawWalls() {
+        grid.ctx.beginPath();
+        grid.ctx.lineWidth = grid.d/30;
+        grid.ctx.strokeStyle = 'black';
+        for(var i=0; i<level.walls.length; i++) {
+            var wall = level.walls[i];
+            grid.ctx.moveTo(wall.x0 * grid.d - grid.x * grid.d, wall.y0 * grid.d - grid.y * grid.d);
+            grid.ctx.lineTo(wall.x1 * grid.d - grid.x * grid.d, wall.y1 * grid.d - grid.y * grid.d);
+        }
+        grid.ctx.stroke();
+        grid.ctx.closePath();
+    }
+
+    drawTerrain() {
+        for(var i=0; i< level.squares.length; i++) {
+            if(!level.fillstyle[level.squares[i]]) continue;
+            var x0 = i % level.W;
+            var y0 = Math.floor(i / level.W); 
+            var x = (x0 - grid.x) * grid.d;
+            var y = (y0 - grid.y) * grid.d;
+            if(x > grid.canvas.width || x + grid.d < 0 || y > grid.canvas.height || y + grid.d < 0) continue;
+            grid.ctx.fillStyle = level.fillstyle[level.squares[i]]
+            grid.ctx.fillRect(x, y, grid.d, grid.d);
+        }
+        
     }
 
     advanceGrid() {
@@ -56,21 +85,21 @@ class Renderer {
         grid.ctx.beginPath();
         grid.ctx.lineWidth = 0.3;
         grid.ctx.strokeStyle = 'black';
-        for(var f = Math.ceil(grid.x)*grid.d-grid.x*grid.d; f<grid.canvas.width; f+=grid.d) {
-            grid.ctx.moveTo(f,0);
-            grid.ctx.lineTo(f,grid.canvas.height);
+        for(var f = Math.ceil(Math.max(0, grid.x))*grid.d-grid.x*grid.d; f<=0.1+Math.min(grid.canvas.width, (level.W - grid.x) * grid.d); f+=grid.d) {
+            grid.ctx.moveTo(f, Math.max(0, -grid.y * grid.d));
+            grid.ctx.lineTo(f, Math.min(grid.canvas.height, (level.H - grid.y) * grid.d));
         }
-        for(var f = Math.ceil(grid.y)*grid.d-grid.y*grid.d; f<grid.canvas.height; f+=grid.d) {
-            grid.ctx.moveTo(0, f);
-            grid.ctx.lineTo(grid.canvas.width, f);
+        for(var f = Math.ceil(Math.max(0, grid.y))*grid.d-grid.y*grid.d; f<=0.1+Math.min(grid.canvas.height, (level.H - grid.y) * grid.d); f+=grid.d) {
+            grid.ctx.moveTo(Math.max(0, -grid.x * grid.d), f);
+            grid.ctx.lineTo(Math.min(grid.canvas.width, (level.W - grid.x) * grid.d), f);
         }
         grid.ctx.stroke();
         grid.ctx.closePath();
     }
 
     drawCreatures() {
-        for(var i in creatureSet) {
-            var creature = creatureSet[i]
+        for(var i in level.creatures) {
+            var creature = level.creatures[i]
             var x = (creature.x - grid.x) * grid.d;
             var y = (creature.y - grid.y) * grid.d;
             if(x>grid.W || x+grid.d<0 || y>grid.H || y+grid.d<0) continue;
@@ -79,7 +108,16 @@ class Renderer {
                 grid.ctx.beginPath();
                 grid.ctx.lineWidth = grid.d/30;
                 grid.ctx.strokeStyle = 'rgb(0, 100, 0)';
-                grid.ctx.rect((creature.x-grid.x) * grid.d, (creature.y-grid.y) * grid.d, grid.d, grid.d);
+                grid.ctx.rect(x, y, grid.d, grid.d);
+                grid.ctx.stroke();
+            }
+            if(keys.pressed.shift) {
+                grid.ctx.fillStyle = 'rgba(120, 30, 30, 0.8)';
+                grid.ctx.fillRect(x, y, grid.d * creature.stats.get('hp') / creature.stats.get('max_hp'), grid.d/5);
+                grid.ctx.beginPath();
+                grid.ctx.lineWidth = grid.d/200;
+                grid.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                grid.ctx.rect(x, y, grid.d, grid.d/5);
                 grid.ctx.stroke();
             }
         }

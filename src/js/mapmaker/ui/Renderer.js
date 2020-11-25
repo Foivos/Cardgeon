@@ -76,7 +76,8 @@ class Renderer {
         }
         switch(mouse.button) {
         case 0:
-            grid.ctx.fillStyle = level.fillstyle[level.codes['solid']];
+            var elem = document.getElementById('paneRightTerrain');
+            grid.ctx.fillStyle = level.fillstyle[level.codes[elem.textContent]];
             break;
         case 2:
             grid.ctx.fillStyle = level.fillstyle[level.codes['clear']];

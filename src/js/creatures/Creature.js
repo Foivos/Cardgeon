@@ -14,7 +14,7 @@ export class Creature {
         this.x = data.x;
         this.y = data.y;
         for(var stat in data.stats) {
-            this.stats.set(stat, data.stats[stat]);
+            this.stats.set(stat, parseFloat(data.stats[stat]));
         }
         this.moves = {};
         for(var move in data.moves) {

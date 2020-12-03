@@ -1,3 +1,5 @@
+import { level } from '../map/Level.js';
+import { intersects } from './Utils.js';
 
 export class PriorityQueue extends Array{
     constructor(compare = null) {
@@ -63,6 +65,19 @@ export class DistanceMap extends Array{
     constructor() {
         super();
     }
+
+
+    init(x0, y0, d) {
+        this.x0 = x0;
+        this.y0 = y0;
+        this.d = d;
+        this.xmin = Math.max(x0 - Math.floor(d), 0);
+        this.xmax = Math.min(x0 + Math.floor(d), level.W - 1);
+        this.ymin = Math.max(y0 - Math.floor(d), 0);
+        this.ymax = Math.min(y0 + Math.floor(d), level.H - 1);
+        this.N = this.xmax - this.xmin + 1;
+        this.length = this.N * (this.ymax - this.ymin + 1);
+    }
     /**
      * Creates a DistanceMap around a set of squares an arbitrary number of variables.
      * @param {number} d The additional distance to traverse to.
@@ -72,15 +87,18 @@ export class DistanceMap extends Array{
      * @param {function} findAdjecent A function thatw take an x and a y and returns objects holding x, y and d, the additional distance.
      */
     initGeneral(d, dmax, x0, y0, findAdjecent, nvars=1, sortI = -1) {
-        this.dmax = Math.floor(dmax);
+        this.xmin = Math.max(x0 - Math.floor(dmax), 0);
+        this.xmax = Math.min(x0 + Math.floor(dmax), level.W - 1);
+        this.ymin = Math.max(y0 - Math.floor(dmax), 0);
+        this.ymax = Math.min(y0 + Math.floor(dmax), level.H - 1);
         this.d = d;
         this.nvars = nvars;
         this.x0 = x0;
         this.y0 = y0;
         this.sortI = sortI === -1 ? this.nvars - 1 : sortI; 
         this.findAdjecent = findAdjecent;
-        this.N = 2 * dmax + 1;
-        this.length = this.N ** 2;
+        this.N = this.xmax - this.xmin + 1;
+        this.length = this.N * (this.ymax - this.ymin + 1);
         this.I0 = [];
     }/**
      * Creates a DistanceMap around a single square with a single variable.
@@ -111,65 +129,29 @@ export class DistanceMap extends Array{
         }
         this.proccess();
     }
-    /**
-     * Calculates the distnaces.
-     */
-    proccess() {
-        var comp = function(x, y) {
-            return x.d < y.d;
-        }
-        var q = new PriorityQueue(comp);
-        for(var i=0; i<this.I0.length; i++) {
-            q.push({x:this.getX(this.I0[i]), y:this.getY(this.I0[i]), d:this[this.I0[i]][this.sortI]});
-        }
-        while(q.length > 0) {
-            var cur = q.pop();
-            var vars = this.get(cur.x, cur.y);
-            if(vars[this.sortI] < cur.d) continue;
-            var Next = this.findAdjecent(cur.x, cur.y);
-            for(var j=0; j<Next.length; j++) {
-                var next = Next[j];
-                if(Math.floor(cur.d + next.d) > this.d) continue;
-                var i = this.getI(next.x, next.y);
-                if(!this[i]) {
-                    this[i] = [];
-                    for(var k=0; k<this.nvars; k++) {
-                        this[i].push(vars[k] + next.d);
-                    }
-                    q.push({x : next.x, y : next.y, d : vars[this.sortI] + next.d});
-                }
-                else {
-                    for(var k=0; k<this.nvars; k++) {
-                        if(this[i][k] > vars[k] + next.d) {
-                            this[i][k] = vars[k] + next.d;
-                            if(k === this.sortI) q.push({x : next.x, y : next.y, d : vars[k] + next.d});
-                        }
-                    }
-                }
-            }
-        }
-    }
+    
     /**
      * Returns the index for the distance map from coorditanes.
      * @param {number} x 
      * @param {number} y 
      */
-    getI(x, y) {if(Math.abs(x - this.x0) > this.dmax || Math.abs(y - this.y0) > this.dmax) return null;
-        return x - this.x0 + this.dmax + (y - this.y0 + this.dmax) * this.N;
+    getI(x, y) {
+        if(x < this.xmin || x > this.xmax || y < this.ymin || y > this.ymax) return null;
+        return x - this.xmin + (y - this.ymin) * this.N;
     }
     /**
      * returns the x value that corresponds to the index i.
      * @param {number} i 
      */
     getX(i) {
-        return i % this.N + this.x0 - this.dmax;
+        return i % this.N + this.xmin;
     }
     /**
      * returns the y value that corresponds to the index i.
      * @param {number} i 
      */
     getY(i) {
-        return Math.floor(i / this.N) + this.y0 - this.dmax;
+        return Math.floor(i / this.N) + this.ymin;
     }
     /**
      * Returns the distnaces from coordinates.
@@ -192,18 +174,90 @@ export class DistanceMap extends Array{
      * Deletes the distance map. This should be invoke before recalculating as arrays are wonky otherise.
      */
     delete() {
-        for(var i=0; i<this.length; i++) {
-            delete this[i];
-        }
         this.length = 0;
+    }
+    
+}
+
+export class WalkingDistanceMap extends DistanceMap {
+    constructor() {
+        super();
+    }
+
+    calculate(x0, y0, d) {
+        this.init(x0, y0, d);
+        this.I0 = [this.getI(x0, y0)];
+        this[this.I0[0]] = 0;
+        this.proccess();
+    }
+    
+    findAdjecent = function(x,y) {
+        var adj = [
+            {x:0, y:1, d:1},
+            {x:0, y:-1, d:1},
+            {x:1, y:0, d:1},
+            {x:-1, y:0, d:1},
+            {x:1, y:1, d:1.5},
+            {x:1, y:-1, d:1.5},
+            {x:-1, y:1, d:1.5},
+            {x:-1, y:-1, d:1.5},
+        ];
+        var r = [];
+        for(var i=0; i<adj.length; i++) {
+            var pos = {x : x + adj[i].x, y : y + adj[i].y, d : adj[i].d};
+            if(level.creatures.occupying(pos.x, pos.y)) {
+                continue;
+            }
+            if(pos.d === 1.5 && (level.creatures.occupying(pos.x, y) || level.creatures.occupying(x, pos.y))) {
+                continue;
+            }
+            var l = {x0 : x, y0 : y, x1 : pos.x, y1: pos.y};
+            for(var j=0; j<level.walls.length; j++) {
+                if(intersects(level.walls[j], l)) continue;
+            }
+            r.push(pos);
+        }
+        return r;
+    }
+    /**
+     * Calculates the distnaces.
+     */
+    proccess() {
+        var comp = function(x, y) {
+            return x.d < y.d;
+        }
+        var q = new PriorityQueue(comp);
+        for(var i=0; i<this.I0.length; i++) {
+            q.push({x:this.getX(this.I0[i]), y:this.getY(this.I0[i]), d:this[this.I0[i]]});
+        }
+        while(q.length > 0) {
+            var cur = q.pop();
+            if(this.get(cur.x, cur.y) < cur.d) continue;
+            var Next = this.findAdjecent(cur.x, cur.y)
+            for(var j=0; j<Next.length; j++) {
+                var next = Next[j];
+                if(Math.floor(cur.d + next.d) > this.d) continue;
+                var i = this.getI(next.x, next.y);
+                if(!this[i]) {
+                    this[i] = cur.d + next.d;
+                    q.push({x : next.x, y : next.y, d : cur.d + next.d});
+                }
+                else {
+                    if(this[i] > cur.d + next.d) {
+                        this[i] = cur.d + next.d;
+                        q.push({x : next.x, y : next.y, d : cur.d + next.d});
+                    }
+                }
+            }
+        }
     }
     /**
      * Returns an array of coordinates and their relative distances of the shortest path to the target coordinates.
      * @param {number} x 
      * @param {number} y 
      */
-    getPathTo(x, y, sortI = 0, within = 0) {
-        var pos = {x:x, y:y, d:this.get(x, y)[sortI]};
+    getPathTo(x, y) {
+        var pos = {x:x, y:y, d:this.get(x, y)};
         var d0 = pos.d;
         var path = [];
         path.push(pos);
@@ -215,24 +269,41 @@ export class DistanceMap extends Array{
                 var next = Next[j];
                 var i = this.getI(next.x, next.y);
                 if(!this[i]) continue;
-                if(this[i][sortI] < min && pos.d - this[i][sortI] === next.d) {
-                    min = this[i][sortI];
+                if(this[i] < min && pos.d - this[i] === next.d) {
+                    min = this[i];
                     nextI = i;
                 }
             }
-            pos={x:this.getX(nextI), y:this.getY(nextI), d:this[nextI][sortI]};
+            pos={x:this.getX(nextI), y:this.getY(nextI), d:this[nextI]};
             path.push(pos);
             
         }
-        path.push({x : this.x0, y : this.y0, d : this[this.getI(this.x0, this.y0)][this.sortI]});
+        path.push({x : this.x0, y : this.y0, d : this[this.getI(this.x0, this.y0)]});
         var rev = [];
         for(var i=path.length-1; i>=0; i--) {
-            if(i < path.length - 1 && d0 - path[i].d <= within && d0 - path[i+1].d > within) {
-                rev.push(path[i]);
-                break;
-            }
             rev.push(path[i]);
         }
         return rev;
+    }
+}
+
+export class TargetDistanceMap extends DistanceMap {
+    constructor(x0, y0, d) {
+        super();
+    }
+
+    calculate(x0, y0, d) {
+        this.init(x0, y0, d);
+        this.proccess();
+    }
+
+    proccess() {
+        for(var i=0; i<this.length; i++) {
+            var x = this.getX(i);
+            var y = this.getY(i);
+            if((x - this.x0) ** 2 + (y - this.y0) ** 2 > this.d) continue;
+            if(!level.haveLOS(x, y, this.x0, this.y0)) continue;
+            this[i] = Math.sqrt((x - this.x0) ** 2 + (y - this.y0) ** 2);
+        }
     }
 }

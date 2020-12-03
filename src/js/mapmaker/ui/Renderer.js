@@ -32,9 +32,9 @@ class Renderer {
         if(keys.pressed.right && !keys.pressed.left) grid.x+=10/grid.d;
         
         if(grid.x < -3 && grid.x + grid.canvas.width / grid.d < level.W + 3) grid.x = Math.min(-3, level.W + 3 - grid.canvas.width / grid.d);
-        if(grid.y < -3 && grid.y + grid.canvas.height / grid.d < level.H + 3) grid.y = Math.min(-3, level.H + 3 - grid.canvas.height / grid.d)
-        if(grid.x + grid.canvas.width / grid.d > level.W + 3 && grid.x > -3) grid.x = Math.max(-3, level.W + 3 - grid.canvas.width / grid.d)
-        if(grid.y + grid.canvas.height / grid.d > level.H + 3 && grid.y > -3) grid.y = Math.max(-3, level.H + 3 - grid.canvas.height / grid.d)
+        if(grid.y < -3 && grid.y + grid.canvas.height / grid.d < level.H + 3) grid.y = Math.min(-3, level.H + 3 - grid.canvas.height / grid.d);
+        if(grid.x + grid.canvas.width / grid.d > level.W + 3 && grid.x > -3) grid.x = Math.max(-3, level.W + 3 - grid.canvas.width / grid.d);
+        if(grid.y + grid.canvas.height / grid.d > level.H + 3 && grid.y > -3) grid.y = Math.max(-3, level.H + 3 - grid.canvas.height / grid.d);
     }
 
     clearGrid() {
@@ -160,43 +160,6 @@ class Renderer {
         }
     }
 
-    drawHighlighs(numbers = false) {
-        grid.ctx.globalAlpha = 0.2;
-        for (var i=0; i<withinRange.length; i++) {
-            if(!withinRange[i]) continue;
-            var x = withinRange.getX(i);
-            var y = withinRange.getY(i);
-            grid.ctx.fillStyle = 'rgb(255, 100, 100)';
-            grid.ctx.fillRect((x-grid.x) * grid.d, (y-grid.y) * grid.d, grid.d, grid.d);
-            if(numbers) {
-                grid.ctx.globalAlpha = 1;
-                grid.ctx.font = "20px Arial";
-                grid.ctx.fillText(withinRange[i][0], (x-grid.x+0.5) * grid.d, (y-grid.y+1) * grid.d);
-                if(withinRange.nvars > 1) grid.ctx.fillText(withinRange[i][1], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
-                grid.ctx.globalAlpha = 0.2;
-            }
-        }
-
-        if(withinRange.length) {
-            grid.ctx.globalAlpha = 1.0;
-            return;
-        }
-        for (var i=0; i<availableMoves.length; i++) {
-            if(!availableMoves[i]) continue;
-            var x = availableMoves.getX(i);
-            var y = availableMoves.getY(i);
-            grid.ctx.fillStyle = 'rgb(100, 100, 255)';
-            grid.ctx.fillRect((x-grid.x) * grid.d, (y-grid.y) * grid.d, grid.d, grid.d);
-            if(numbers) {
-                grid.ctx.globalAlpha = 1;
-                grid.ctx.font = "20px Arial";
-                grid.ctx.strokeStyle = 'black';
-                grid.ctx.fillText(availableMoves[i][0], (x-grid.x) * grid.d, (y-grid.y+1) * grid.d);
-                grid.ctx.globalAlpha = 0.2;
-            }
-        }
-        grid.ctx.globalAlpha = 1.0;
-    }
 
     advanceCreatures() {
         for(var i=0; i<movingCreatures.length; i++) {
@@ -213,10 +176,10 @@ class Renderer {
                 movingCreatures.remove(mc);
                 i--;
                 if(turn.remainingMove >= 1) {
-                    availableMoves.calculate();
+                    turn.availableMoves.calculate(turn.hero.x, turn.hero.y, turn.remainingMove);
                 }
                 if(hand.selected && hand.selected.range) {
-                    withinRange.calculate(hand.selected.range);
+                    turn.targeting.calculate(hand.selected.range);
                 }
                 turn.moving = false;
                 continue;

@@ -2,8 +2,7 @@ import { hand } from '../cards/Hand.js';
 import { paneLeft } from '../ui/PaneLeft.js';
 import { renderer } from '../ui/Renderer.js';
 import { movingCreatures } from '../creatures/MovingCreatures.js';
-import { availableMoves } from './AvailableMoves.js';
-import { withinRange } from './WithinRange.js';
+import { TargetDistanceMap, WalkingDistanceMap } from '../core/Containers.js';
 
 export class Turn {
     constructor() {
@@ -11,13 +10,15 @@ export class Turn {
         this.remainingMove = 0;
         this.actions = 0;
         this.toDraw = 0;
+        this.availableMoves = new WalkingDistanceMap();
+        this.targeting = new TargetDistanceMap;
     }
 
     move(path, onFinish) {
         movingCreatures.push(this.hero, path, onFinish);
         this.remainingMove -= path[path.length-1].d;
-        availableMoves.delete();
-        withinRange.delete();
+        this.availableMoves.delete();
+        this.targeting.delete();
     }
 
     start(hero, onStart) {

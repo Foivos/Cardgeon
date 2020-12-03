@@ -88,11 +88,11 @@ class Level {
         }
         for(var i=0; i<this.walls.length; i++) {
             var wall = this.walls[i];
-            if(wall.x0 >= x0 && wall.x0 <= x1 && wall.y0 >= y0 && wall.y0 <= y1) {
+            if(wall.x0 > x0 && wall.x0 < x1 && wall.y0 > y0 && wall.y0 < y1) {
                 this.walls.splice(i--, 1);
                 continue;
             }
-            if(wall.x1 >= x0 && wall.x1 <= x1 && wall.y1 >= y0 && wall.y1 <= y1) {
+            if(wall.x1 > x0 && wall.x1 < x1 && wall.y1 > y0 && wall.y1 < y1) {
                 this.walls.splice(i--, 1);
                 continue;
             }
@@ -167,6 +167,14 @@ class Level {
         }
         this.W = W;
         this.H = H;
+    }
+
+    hasLOS(x0, y0, x1, y1) { 
+        var l = {x0 : x0, y0 : y0, x1 : x1, y1 : y1};
+        for(var i=0; i<this.walls.length; i++) {
+            if(this.intersects(walls[i], l)) return false;
+        }
+        return true;
     }
 }
 

@@ -1,10 +1,7 @@
 import { selectedCreature } from '../creatures/SelectedCreature.js';
-import { availableMoves } from '../turn/AvailableMoves.js';
 import { getTime } from '../core/Utils.js';
 import { turn } from '../turn/Turn.js';
 import { mouse } from '../core/Mouse.js';
-import { hand } from '../cards/Hand.js';
-import { withinRange } from '../turn/WithinRange.js';
 import { grid } from './Grid.js';
 import { level } from '../map/Level.js';
 
@@ -35,6 +32,12 @@ export function onmousemove(e) {
     if (!e) e = window.event;
     grid.x -= (e.clientX - grid.mouse.x) / grid.d;
     grid.y -= (e.clientY - grid.mouse.y) / grid.d;
+
+    if(grid.x < -3 && grid.x + grid.canvas.width / grid.d < level.W + 3) grid.x = Math.min(-3, level.W + 3 - grid.canvas.width / grid.d);
+    if(grid.y < -3 && grid.y + grid.canvas.height / grid.d < level.H + 3) grid.y = Math.min(-3, level.H + 3 - grid.canvas.height / grid.d);
+    if(grid.x + grid.canvas.width / grid.d > level.W + 3 && grid.x > -3) grid.x = Math.max(-3, level.W + 3 - grid.canvas.width / grid.d);
+    if(grid.y + grid.canvas.height / grid.d > level.H + 3 && grid.y > -3) grid.y = Math.max(-3, level.H + 3 - grid.canvas.height / grid.d);
+
     grid.mouse = {x:e.clientX, y:e.clientY};
 }
 
@@ -50,13 +53,13 @@ export function onmouseup(e) {
     if(creature) {
         selectedCreature.set(creature);
     }
-    if(withinRange.get(x, y)) {
-        withinRange.onSelect(x, y);
+    if(turn.targeting.get(x, y)) {
+        turn.targeting.onSelect(x, y);
     }
     
-    if(withinRange.length > 0 || availableMoves.length === 0 ||  (x === turn.hero.x &&  y === turn.hero.y)) return;
-    if(availableMoves.get(x, y)) {
-        var path = availableMoves.getPathTo(x, y);
+    if(turn.targeting.length > 0 || turn.availableMoves.length === 0 ||  (x === turn.hero.x &&  y === turn.hero.y)) return;
+    if(turn.availableMoves.get(x, y)) {
+        var path = turn.availableMoves.getPathTo(x, y);
         turn.move(path);
     }
 }

@@ -1,6 +1,6 @@
 
 import { level } from '../map/Level.js';
-import { withinRange } from '../turn/WithinRange.js';
+import { turn } from '../turn/Turn.js';
 import { resolver } from './Resolver.js';
 
 export const selectorMaps = {
@@ -10,11 +10,11 @@ export const selectorMaps = {
 }
 
 function single(range) {
-    withinRange.calculate(range);
-    withinRange.onSelect = function(x ,y) {
+    turn.targeting.calculate(turn.hero.x, turn.hero.y, range);
+    turn.targeting.onSelect = function(x ,y) {
         var creature = level.creatures.occupying(x, y);
         if(!creature) return;
-        withinRange.delete();
+        turn.targeting.delete();
         resolver.send(creature);
     }
 }

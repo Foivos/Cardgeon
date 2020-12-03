@@ -65,10 +65,10 @@ export function onmousemove(e) {
         }
         grid.x -= (e.layerX - grid.mouse.x) / grid.d;
         grid.y -= (e.layerY - grid.mouse.y) / grid.d;
-        if(grid.x < -3) grid.x = -3;
-        if(grid.y < -3) grid.y = -3;
-        if(grid.x + grid.canvas.width / grid.d > level.W +3) grid.x = level.W +3 - grid.canvas.width / grid.d;
-        if(grid.y + grid.canvas.height / grid.d > level.H +3) grid.y = level.H +3 - grid.canvas.height / grid.d;
+        if(grid.x < -3 && grid.x + grid.canvas.width / grid.d < level.W + 3) grid.x = Math.min(-3, level.W + 3 - grid.canvas.width / grid.d);
+        if(grid.y < -3 && grid.y + grid.canvas.height / grid.d < level.H + 3) grid.y = Math.min(-3, level.H + 3 - grid.canvas.height / grid.d);
+        if(grid.x + grid.canvas.width / grid.d > level.W + 3 && grid.x > -3) grid.x = Math.max(-3, level.W + 3 - grid.canvas.width / grid.d);
+        if(grid.y + grid.canvas.height / grid.d > level.H + 3 && grid.y > -3) grid.y = Math.max(-3, level.H + 3 - grid.canvas.height / grid.d);
         grid.mouse = {x:e.layerX, y:e.layerY};
         return;
     }

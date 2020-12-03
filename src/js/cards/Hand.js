@@ -3,10 +3,8 @@ import { cardPositions } from './CardPositions.js';
 import { Card } from './Card.js';
 import { mouseover, mouseout, mousedown } from './CardEventHandlers.js';
 import { paneRight } from '../ui/PaneRight.js';
-import { paneLeft } from '../ui/PaneLeft.js';
-import { withinRange } from '../turn/WithinRange.js';
-import { movingCreatures } from '../creatures/MovingCreatures.js';
 import { renderer } from '../ui/Renderer.js';
+import { turn } from '../turn/Turn.js';
 
 class Hand extends CardSet{
     constructor() {
@@ -82,7 +80,7 @@ class Hand extends CardSet{
     }
 
     deselect(i=0) {
-        withinRange.length = 0;
+        turn.targeting.delete();
         if(this.selected) this.push(this.selected, i);
         delete this.selected;
     }

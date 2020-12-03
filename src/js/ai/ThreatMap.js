@@ -6,5 +6,7 @@ class ThreatMap extends Array{
     }
     init(enemy) {
         this.enemy = enemy;
+        this.length = level.W * level.H;
+        
     }
 }

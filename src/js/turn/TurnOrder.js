@@ -1,6 +1,4 @@
-import { availableMoves } from './AvailableMoves.js';
 import { turn } from './Turn.js';
-import { withinRange } from './WithinRange.js';
 
 class TurnOrder extends Array{
     constructor() {
@@ -13,8 +11,8 @@ class TurnOrder extends Array{
         turn.end(function() {
             turn.start(turnOrder[turnOrder.i]);
         });
-        availableMoves.delete()
-        withinRange.delete();
+        turn.availableMoves.delete()
+        turn.targeting.delete();
     }
 
     start() {

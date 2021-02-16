@@ -1,5 +1,8 @@
 import { getTime } from './Utils.js';
 
+/**
+ * Used to keep track of mouse actions.
+ */
 class Mouse {
     constructor() {
         this.lastClicked = null;
@@ -18,6 +21,10 @@ class Mouse {
 
 export var mouse = new Mouse();
 
+/**
+ * Handles the mousedown event.
+ * @param {Event} e 
+ */
 function onmousedown(e) {
     mouse.lastClicked = getTime();
     mouse.lastX = e.clientX;
@@ -25,10 +32,16 @@ function onmousedown(e) {
     mouse.button = e.button;
     mouse.shift = e.shiftKey;
 }
-
+/**
+ * Handles the mouseup event.
+ * @param {Event} e 
+ */
 function onmouseup(e) {
 }
-
+/**
+ * Handles the mousemove event.
+ * @param {Event} e 
+ */
 function onmousemove(e) {
     mouse.x = e.clientX;
     mouse.y = e.clientY;

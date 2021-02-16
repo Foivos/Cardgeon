@@ -15,8 +15,8 @@ class Grid {
         this.canvas.height = document.body.clientHeight;
         
         this.canvas.onwheel = scroll;
-        this.canvas.onmousedown = onmousedown;
-        this.canvas.oncontextmenu = oncontextmenu;
+        this.canvas.addEventListener('mousedown', onmousedown);
+        this.canvas.addEventListener('contextmenu', oncontextmenu)
         this.canvas.addEventListener('mousemove', mousemoveGeneral, false);
         this.canvas.addEventListener('mouseup', clickGeneral, false);
         document.body.appendChild(this.canvas);

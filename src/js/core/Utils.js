@@ -1,8 +1,15 @@
 
+/**
+ * Returns the current time in miliseconds.
+ */
 export function getTime() {
     return (new Date()).getTime();
 }
-
+/**
+ * Gets the json stored on the server and passes in to execute.
+ * @param {string} name The name of the file (without the 'res/' prefix or the 'json' suffix).
+ * @param {function} execute The function to pass the data to when done.
+ */
 export function getInfo(name, execute) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -14,8 +21,12 @@ export function getInfo(name, execute) {
     xhttp.open('GET', 'res/' + name + '.json', true);
     xhttp.send();
 }
-
-
+/**
+ * Get each line that the text should be pritnet as on the context within a certain width.
+ * @param {CanvasRenderingContext2D} ctx The context that the text is to be printed on.
+ * @param {string} text The text to print.
+ * @param {number} maxWidth The maximum width that the text is to occupy.
+ */
 export function getLines(ctx, text, maxWidth) {
     var words = text.split(" ");
     var lines = [];
@@ -35,7 +46,11 @@ export function getLines(ctx, text, maxWidth) {
     return lines;
 }
 
-
+/**
+ * Recursivelly turns an element into an array of a certain depth. Note that asArray([[1,2]], 3) = [[[1], [2]]].
+ * @param {*} a The element to turn into an array.
+ * @param {numbr} n The number of dimentions the array shoud have.
+ */
 export function asArray(a, n = 1) {
     if(n <= 1) {
         if(a === null || typeof a === 'undefined') return [];
@@ -50,7 +65,10 @@ export function asArray(a, n = 1) {
     }
     return r;
 }; 
-
+/**
+ * Inverts a matrix.
+ * @param {Array.Array.number} M 
+ */
 export function matrixInvert(M){
     // I use Guassian Elimination to calculate the inverse:
     // (1) 'augment' the matrix (left) by the identity (on the right)
@@ -141,7 +159,11 @@ export function matrixInvert(M){
     //matrix I should be the inverse:
     return I;
 }
-
+/**
+ * Multiplies two matrices together.
+ * @param {Array.Array.number} M1 
+ * @param {Array.Array.number} M2 
+ */
 export function matrixMultiply(M1, M2) {
     
     if(M1[0].length !== M2.length){return;}
@@ -159,7 +181,11 @@ export function matrixMultiply(M1, M2) {
     }
     return R;
 }
-
+/**
+ * Returns true iff the two lines intersect. Returns false if they are barely touching.
+ * @param {Object} l1 {x0, y0, x1, y1}
+ * @param {Object} l2 {x0, y0, x1, y1}
+ */
 export function intersects(l1, l2) {
     if(Math.abs((l1.x1 - l1.x0) * (l2.y1 - l2.y0) - (l2.x1 - l2.x0) * (l1.y1 - l1.y0)) < 1e-12) {
         if(Math.abs((l1.x0 * l1.y1 - l1.x1 * l1.y0 - l2.x0 * l2.y1 + l2.x1 * l2.y0)) < 1e-12) {

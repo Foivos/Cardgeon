@@ -1,7 +1,6 @@
 import { renderer } from '../ui/Renderer.js';
 import { getTime, matrixInvert, matrixMultiply } from '../core/Utils.js';
 import { Card } from './Card.js';
-import { CardCoord } from './CardCoord.js';
 
 
 
@@ -35,7 +34,7 @@ export class CardMovement {
                 this.onArrive();
             }
         }
-        for(var key in CardCoord.default) { 
+        for(var key in Card.default) { 
             var Ts = [];
             for(var i=0; i<this[key].length; i++) {
                 Ts.push(t ** i);
@@ -50,7 +49,7 @@ export class CardMovement {
         var coords = [this.card];
         coords.push(...this.coords);
         var derivs = this.derivs;
-        for(var key in CardCoord.default) {
+        for(var key in Card.default) {
             var Ys = [];
             var Ts = [];
             var N = coords.length;
@@ -58,7 +57,7 @@ export class CardMovement {
             for(var i=0; i<N; i++) {
                 var n = coords[i][key];
                 if(!n && n !== 0) {
-                    n = CardCoord.default[key];
+                    n = Card.default[key];
                 }
                 Ys.push([n]);
                 var t = coords[i].t;

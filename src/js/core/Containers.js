@@ -1,10 +1,20 @@
 
+/**
+ * A priority queue implementation.
+ */
 export class PriorityQueue extends Array{
+    /**
+     * @param {function} compare If provided it should accept two elements that will be passed to the queue and return true only if the first element should be returned first.
+     */
     constructor(compare = null) {
         super();
         this.compare = compare ? compare : function(e1, e2) {return e1<e2};;
     }
-
+    /**
+     * Push an element to the specified position. If n is not provided the element will be appended insted.
+     * @param {*} elem The element to be added to the queue.
+     * @param {number} n the position to add the element to.
+     */
     push(elem, n=null) {
         n = n != null ? n : this.length; 
         var i = 0;
@@ -26,7 +36,9 @@ export class PriorityQueue extends Array{
             this[n] = elem;
         }
     }
-
+    /**
+     * Return the (by default smallest) top element and reorders the rest of the queue.
+     */
     pop() {
         var r = this[0];
         for(var i=0; i<this.length; ) {
@@ -58,7 +70,9 @@ export class PriorityQueue extends Array{
     }
 }
 
-
+/**
+ * A container that has saves all the distances from a point and can potentially be used for pathfinding.
+ */
 export class DistanceMap extends Array{
     constructor() {
         super();
@@ -67,8 +81,8 @@ export class DistanceMap extends Array{
      * Creates a DistanceMap around a set of squares an arbitrary number of variables.
      * @param {number} d The additional distance to traverse to.
      * @param {number} dmax The maximum distance to traverse to.
-     * @param {Array.number} x0 The center x's of the distance map.
-     * @param {Array.number} y0 The center y's of the distance map.
+     * @param {number} x0 The center x's of the distance map.
+     * @param {number} y0 The center y's of the distance map.
      * @param {function} findAdjecent A function thatw take an x and a y and returns objects holding x, y and d, the additional distance.
      */
     initGeneral(d, dmax, x0, y0, findAdjecent, nvars=1, sortI = -1) {

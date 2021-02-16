@@ -60,3 +60,8 @@ export function onmouseup(e) {
         turn.move(path);
     }
 }
+
+export function oncontextmenu(e) {
+    e.preventDefault();
+    return false;
+}

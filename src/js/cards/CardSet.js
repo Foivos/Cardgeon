@@ -1,5 +1,8 @@
 import {Card} from './Card.js'
 
+/**
+ * A card array with some additional functionalily.
+ */
 export class CardSet extends Array{
     constructor() {
         super();

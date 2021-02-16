@@ -1,4 +1,7 @@
 
+/**
+ * A class used to keep track of keypresses.
+ */
 class Keys {
     constructor() {
         this.commands = {

@@ -1,23 +1,25 @@
 import { CardSet } from './CardSet.js';
 import { cardPositions } from './CardPositions.js';
 import { Card } from './Card.js';
-import { mouseover, mouseout, mousedown } from './CardEventHandlers.js';
+import { mouseover, mouseout, mousedown, mouseup, mousemove, contextmenu } from './CardEventHandlers.js';
 import { paneRight } from '../ui/PaneRight.js';
 import { renderer } from '../ui/Renderer.js';
 import { turn } from '../turn/Turn.js';
 
+/**
+ * A represents the active hand of the player.
+ */
 class Hand extends CardSet{
     constructor() {
         super();
 
         this.highlight = document.createElement('img');
+        this.highlight.id = 'handHighlight'
         this.highlight.src = 'res/highlight.png';
         this.highlight.style.position = 'absolute';
         this.highlight.style.top = 0;
         this.highlight.style.left = 0;
         this.highlight.style.zIndex = 30;
-        this.highlight.style.display = 'none';
-        document.body.appendChild(this.highlight);
     }
     
     /**
@@ -41,16 +43,12 @@ class Hand extends CardSet{
      */
     push(card, i=null) {
         super.push(card, i);
-        if(card.getTurnover() <= 1) {
-            card.elem.addEventListener('mouseover', mouseover);
-            card.elem.addEventListener('mouseout', mouseout);
-            card.elem.addEventListener('mousedown', mousedown);
-        }
-        else {
-            card.back.addEventListener('mouseover', mouseover);
-            card.back.addEventListener('mouseout', mouseout);
-            card.back.addEventListener('mousedown', mousedown);
-        }
+        card.elem.addEventListener('mouseover', mouseover.bind(card));
+        card.elem.addEventListener('mouseout', mouseout.bind(card));
+        card.elem.addEventListener('mousedown', mousedown.bind(card));
+        card.elem.addEventListener('mousemove', mousemove.bind(card));
+        card.elem.addEventListener('mouseup', mouseup.bind(card));
+        card.elem.addEventListener('contextmenu', contextmenu);
         delete renderer.movingCards[card.id];
         this.position();
     }
@@ -60,16 +58,21 @@ class Hand extends CardSet{
      */
     remove(card) {
         super.remove(card);
-        card.elem.removeEventListener('mouseover', mouseover);
-        card.elem.removeEventListener('mouseout', mouseout);
+        card.canvas.removeEventListener('mouseover', mouseover);
+        card.canvas.removeEventListener('mouseout', mouseout);
     }
-
+    /**
+     * Removes the last card from the hand.
+     */
     pop() {
         var card = super.pop();
         //card.hide();
         return card;
     }
-
+    /**
+     * Selects a card when it is played.
+     * @param {Card} card The card to select.
+     */
     select(card) {
         this.deselect();
         this.selected = card;
@@ -78,17 +81,27 @@ class Hand extends CardSet{
         this.remove(card);
         card.activate();
     }
-
+    /**
+     * Deselects a card.
+     * @param {number} i The position to return the card to.
+     */
     deselect(i=0) {
         turn.targeting.delete();
         if(this.selected) this.push(this.selected, i);
         delete this.selected;
     }
-
+    /**
+     * Check to see if x and y are close enought to the hand that the card should not be played.
+     * @param {number} x The x coordinate.
+     * @param {number} y The y coordinate.
+     */
     reorderingFrom(x, y) {
         return y > document.body.clientHeight-Card.H*Card.scaleB && x < document.body.clientWidth - paneRight.W;
     }
-
+    /**
+     * Discard the entire hand.
+     * @param {function} onDiscard What to do once the hand is done discarding.
+     */
     discardAll(onDiscard) {
         hand.deselect();
 

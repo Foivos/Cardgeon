@@ -69,7 +69,7 @@ export function cardPositions(N) { if(N === 0) return [];
 };
 
 /**
- * Calculates the next card position from the previus one. Should be used whne the cards are on the left side of the hand.
+ * Calculates the next card position from the previus one. Should be used when the cards are on the left side of the hand.
  * @param {object} pos
  * @param {number} dx 
  * @param {number} degx

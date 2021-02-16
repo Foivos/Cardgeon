@@ -2,92 +2,106 @@ import { hand } from './Hand.js';
 import { Card } from './Card.js';
 import { renderer } from '../ui/Renderer.js';
 
-export function move(e) {
+/**
+ * Handles the mousemove event for cards.
+ * @param {Event} e 
+ */
+export function mousemove(e) {
     e = e || window.event;
     e.preventDefault();
+    if(hand.moving !== this) return;
 
-    if(hand.moving) {
-        hand.moving.setX(e.clientX);
-        hand.moving.setY(e.clientY);
-        
-        if(hand.reorderingFrom(e.clientX, e.clientY)) {
-            hand.highlight.style.display = 'none';
-            if(!hand.includes(hand.moving)) {
-                hand.push(hand.moving);
-            }
-            var i = hand.findIndex(elem => elem === hand.moving);
-            while(i<hand.length-1 && hand.moving.getX()<hand[i+1].getX()) {
-                hand[i] = hand[i+1];
-                hand[i+1] = hand.moving;
-                i++;
-            }
-            while (i>0) {
-                if (i === 1){
-                    if (hand.moving.getX()<hand[i-1].getX()) break;
-                }
-                else if (hand.moving.getX() + Card.W*hand.moving.getScale()/2 < hand[i-2].getX() - Card.W*hand[i-2].getScale()/2) break;
-                hand[i] = hand[i-1];
-                hand[i-1] = hand.moving;
-                i--;
-            }
+    this.setX(e.clientX);
+    this.setY(e.clientY);
+    
+    if(hand.reorderingFrom(e.clientX, e.clientY)) {
+        if(document.getElementById('handHighlight')) this.elem.removeChild(hand.highlight);
+        if(!hand.includes(this)) {
+            hand.push(this);
         }
-        else {
-            hand.remove(hand.moving);
-            hand.highlight.style.display = 'block';
-            hand.highlight.style.width = Card.scaleB * Card.W * 1.01;
-            hand.highlight.style.top = hand.moving.getY() - Card.scaleB * Card.H / 2 * 1.01;
-            hand.highlight.style.left = hand.moving.getX() - Card.scaleB * Card.W / 2 * 1.01;
+        var i = hand.findIndex(elem => elem === this);
+        while(i<hand.length-1 && this.getX()<hand[i+1].getX()) {
+            hand[i] = hand[i+1];
+            hand[i+1] = this;
+            i++;
         }
+        while (i>0) {
+            if (i === 1){
+                if (this.getX() < hand[i-1].getX()) break;
+            }
+            else if (this.getX() + Card.W * this.getScale() / 2 < hand[i-2].getX() - Card.W * hand[i-2].getScale() / 2) break;
+            hand[i] = hand[i-1];
+            hand[i-1] = this;
+            i--;
+        }
+    }
+    else {
+        hand.remove(hand.moving);
+        hand.moving.elem.appendChild(hand.highlight);
+        hand.highlight.style.width = Card.scaleB * Card.W * 1.01;
     }
     hand.position();
 }
-
+/**
+ * Handles the mouseup event for cards.
+ * @param {Event} e 
+ */
 export function mouseup(e) {
+    if(hand.moving !== this) return;
     if(!hand.reorderingFrom(e.clientX, e.clientY) && hand.moving) {
         hand.deselect();
         hand.select(hand.moving);
     }
-    document.onmouseup = null;
-    document.onmousemove = null;
-    delete hand.moving;
-    hand.highlight.style.display = 'none';
+    hand.moving = null;
+    if(document.getElementById('handHighlight')) this.elem.removeChild(hand.highlight);
     hand.position();
 }
 /**
- * Handle the onmouseout event.
+ * Handle the onmouseout event for cards.
  * @param {Event} e 
  */
 export function mouseout(e) {
     if(!e.target.id) return;
-    delete hand.hovered;
+    hand.hovered = null;
     hand.position();
 }
 /**
- * handles the onmousedown event.
+ * handles the onmousedown event for cards.
  * @param {Event} e 
  */
 export function mousedown(e){
-    var card = hand.hovered || hand.selected;
     e = e || window.event;
     e.preventDefault();
-    delete hand.hovered;
-    card.setScale(Card.scaleB);
-    card.setX(e.clientX);
-    card.setY(e.clientY);
-    card.setDeg(0);
-    hand.moving = card;
-    delete renderer.movingCards[hand.moving.id]
-    document.onmouseup = mouseup;
-    hand.deselect();
-    hand.position();
-    document.onmousemove = move;
+    if(e.button === 0) {
+        var card = hand.hovered || hand.selected;
+        if(!card) return;
+        delete hand.hovered;
+        card.setScale(Card.scaleB);
+        card.setX(e.clientX);
+        card.setY(e.clientY);
+        card.setDeg(0);
+        hand.moving = card;
+        delete renderer.movingCards[hand.moving.id]
+        hand.deselect();
+        hand.position();
+    }
+    else if(e.button === 2 && (hand.moving || hand.selected)) {
+        if(this === hand.selected) hand.deselect();
+        if(!hand.includes(this)) {
+            hand.push(this);
+        }
+        hand.moving = null;
+        if(document.getElementById('handHighlight')) this.elem.removeChild(hand.highlight);
+        hand.position();
+    }
 }
 /**
- * handles the onmouseover event.
+ * handles the onmouseover event for cards.
  * @param {Event} e 
  */
 export function mouseover(e) {
     if(hand.moving) return;
+    if(hand.selected && e.target === hand.selected.canvas) return;
     e = e || window.event;
     e.preventDefault();
     var i;
@@ -100,6 +114,14 @@ export function mouseover(e) {
     }
     var card = hand[i];
     hand.hovered = card;
-    card.elem.style.zIndex = 11;
+    card.canvas.style.zIndex = 11;
     hand.position();
+}
+/**
+ * Handles the contextmenuevent to prevent rightclicking cards from showing the menu.
+ * @param {Event} e 
+ */
+export function contextmenu(e) {
+    e.preventDefault();
+    return false;
 }
